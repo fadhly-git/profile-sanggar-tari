@@ -1,0 +1,174 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Model untuk User Admin
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  articles       Article[]
+  galleryItems   GalleryItem[]
+  scheduleEvents ScheduleEvent[]
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  SUPER_ADMIN
+}
+
+// Model untuk Artikel/Blog
+model Article {
+  id            String        @id @default(cuid())
+  title         String
+  slug          String        @unique
+  excerpt       String?       @db.Text
+  content       String        @db.LongText
+  featuredImage String?
+  status        ArticleStatus @default(DRAFT)
+  publishedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("articles")
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// Model untuk Galeri
+model GalleryItem {
+  id          String    @id @default(cuid())
+  title       String
+  description String?   @db.Text
+  imageUrl    String
+  type        MediaType @default(IMAGE)
+  category    String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("gallery_items")
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+// Model untuk Jadwal/Kalender Kegiatan
+model ScheduleEvent {
+  id            String         @id @default(cuid())
+  title         String
+  description   String?        @db.Text
+  startDate     DateTime
+  endDate       DateTime?
+  location      String?
+  isRecurring   Boolean        @default(false)
+  recurringType RecurringType?
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Relations
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("schedule_events")
+}
+
+enum RecurringType {
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+// Model untuk FAQ
+model FAQ {
+  id        String   @id @default(cuid())
+  question  String   @db.Text
+  answer    String   @db.LongText
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("faqs")
+}
+
+// Model untuk Contact Form Submissions
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String   @db.LongText
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("contact_submissions")
+}
+
+// Model untuk Settings Website
+model Setting {
+  id    String      @id @default(cuid())
+  key   String      @unique
+  value String      @db.LongText
+  type  SettingType @default(TEXT)
+
+  @@map("settings")
+}
+
+enum SettingType {
+  TEXT
+  TEXTAREA
+  IMAGE
+  BOOLEAN
+  JSON
+}
+
+// Model untuk Page Content (About Us, Contact Info, dll)
+model PageContent {
+  id        String   @id @default(cuid())
+  pageKey   String   @unique // 'about_us', 'vision_mission', 'history', 'contact_info'
+  title     String
+  content   String   @db.LongText
+  metadata  String?  @db.LongText // untuk data tambahan seperti alamat, telepon, dll
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("page_contents")
+}
