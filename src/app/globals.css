@@ -120,3 +120,85 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Jika belum menginstall @tailwindcss/typography, bisa gunakan styling custom */
+.prose {
+  max-width: none;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+
+.prose p {
+  margin-bottom: 1em;
+}
+
+.prose ul, .prose ol {
+  margin-bottom: 1em;
+  padding-left: 1.5em;
+}
+
+.prose li {
+  margin-bottom: 0.25em;
+}
+
+.prose blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1em;
+  margin: 1em 0;
+  font-style: italic;
+}
+
+.prose code {
+  background-color: #f3f4f6;
+  padding: 0.125em 0.25em;
+  border-radius: 0.25em;
+  font-size: 0.875em;
+}
+
+/* Tambahkan ke global.css atau di komponen */
+.rich-text-viewer .ProseMirror {
+  outline: none !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.rich-text-viewer .ProseMirror h1 {
+  @apply text-2xl font-bold mb-4;
+}
+
+.rich-text-viewer .ProseMirror h2 {
+  @apply text-xl font-semibold mb-3;
+}
+
+.rich-text-viewer .ProseMirror h3 {
+  @apply text-lg font-medium mb-2;
+}
+
+.rich-text-viewer .ProseMirror p {
+  @apply mb-3 leading-relaxed;
+}
+
+.rich-text-viewer .ProseMirror ul,
+.rich-text-viewer .ProseMirror ol {
+  @apply mb-3 ml-6;
+}
+
+.rich-text-viewer .ProseMirror li {
+  @apply mb-1;
+}
+
+.rich-text-viewer .ProseMirror blockquote {
+  @apply border-l-4 border-muted pl-4 italic text-muted-foreground mb-3;
+}
+
+.rich-text-viewer .ProseMirror img {
+  @apply max-w-full h-auto rounded-lg mb-3;
+}
+
+.rich-text-viewer .ProseMirror a {
+  @apply text-blue-600 underline hover:text-blue-800 transition-colors;
+}

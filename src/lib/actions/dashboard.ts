@@ -147,9 +147,9 @@ export async function getDashboardData(): Promise<ExtendedDashboardData> {
         id: event.id,
         title: event.title,
         startDate: event.startDate.toISOString(),
-        endDate: event.endDate?.toISOString() || null,
-        location: event.location,
-        description: event.description
+        endDate: event.endDate ? event.endDate.toISOString() : undefined,
+        location: event.location ?? undefined,
+        description: event.description ?? undefined
       })),
       recentMessages: recentMessages.map(message => ({
         id: message.id,

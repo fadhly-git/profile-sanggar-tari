@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { ExtendedDashboardData } from '@/types/dashboard';
 import StatsCards from '@/components/dashboard/stats-card';
@@ -23,6 +23,11 @@ interface DashboardPageProps {
 }
 
 const DashboardPage: React.FC<DashboardPageProps> = ({ dashboardData }) => {
+    const [lastUpdated, setLastUpdated] = useState('');
+
+    useEffect(() => {
+        setLastUpdated(new Date().toLocaleTimeString('id-ID'));
+    }, []);
     const { data: session } = useSession();
     const user: User | undefined = session?.user
         ? {
@@ -170,7 +175,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ dashboardData }) => {
                         </CardContent>
                         <CardFooter className="mt-4 pt-4 border-t border-blue-400">
                             <p className="text-sm text-blue-100">
-                                Last updated: {new Date().toLocaleTimeString('id-ID')}
+                                Last updated: {lastUpdated}
                             </p>
                         </CardFooter>
                     </Card>
