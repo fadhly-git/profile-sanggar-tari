@@ -75,7 +75,7 @@ export function NavMain({
                 asChild
                 tooltip={item.title}
                 isActive={isParentActive(item)}
-                className={hasActiveChild(item) && !isActive(item.url) ? "bg-muted/50" : ""}
+                className={`data-[active=true]:bg-accent data-[active=true]:border data-[active=true]:border-primary data-[active=true]:text-accent-foreground ${hasActiveChild(item) && !isActive(item.url) ? " bg-muted/50" : ""}`}
               >
                 <Link href={item.url}>
                   <item.icon />
