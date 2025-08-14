@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import { getPageContentById } from "@/lib/page-content/actions"
-import { PageContentForm } from "@/components/page-content/page-content-form"
+import { PageContentForm } from "@/components/admin/page-content/page-content-form"
 
 interface EditPageContentPageProps {
     params: Promise<{ id: string }>

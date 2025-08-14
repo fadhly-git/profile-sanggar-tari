@@ -3,13 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { ExtendedDashboardData } from '@/types/dashboard';
-import StatsCards from '@/components/dashboard/stats-card';
-import RecentArticles from '@/components/dashboard/recent-article';
-import TodaySchedule from '@/components/dashboard/today-schedule';
+import StatsCards from '@/components/admin/dashboard/stats-card';
+import RecentArticles from '@/components/admin/dashboard/recent-article';
+import TodaySchedule from '@/components/admin/dashboard/today-schedule';
 import { type User } from "@/types"
 import { getInitialName } from "@/lib/utils"
 import { useSession } from 'next-auth/react';
-import { Role } from '@/generated/prisma';
+import { Role } from '@prisma/client';
 import {
     Card,
     CardContent,

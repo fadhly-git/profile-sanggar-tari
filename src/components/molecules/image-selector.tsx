@@ -33,7 +33,7 @@ export function ImageSelector({
                 {required && <span className="text-red-500 ml-1">*</span>}
             </Label>
 
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 flex-wrap">
                 {value && (
                     <ImagePreview
                         src={value}
@@ -47,7 +47,6 @@ export function ImageSelector({
                     onSelect={onChange}
                     selectedUrl={value}
                     allowCustomCategory={true}
-
                     trigger={
                         <Button type="button" variant="outline" size="sm">
                             {value ? (
@@ -67,7 +66,7 @@ export function ImageSelector({
             </div>
 
             {helperText && (
-                <p className="text-sm text-gray-500">{helperText}</p>
+                <p className="text-sm text-primary">{helperText}</p>
             )}
         </div>
     )

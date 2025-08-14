@@ -53,11 +53,12 @@ export function PageContentForm({ initialData, mode }: PageContentFormProps) {
             'pageContentPreview',
             JSON.stringify({
                 ...values,
+                id: initialData?.id || undefined,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
             })
         );
-        router.push(`/admin/page-content/preview/${values.pageKey}`);
+        window.open(`/admin/page-content/preview/${values.pageKey}`, '_blank');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {

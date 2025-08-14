@@ -1,7 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { getDashboardData } from '@/lib/actions/dashboard';
-import DashboardPage from '@/components/dashboard/dashboard-page';
+import DashboardPage from '@/components/admin/dashboard/dashboard-page';
 
 export const metadata: Metadata = {
   title: 'Dashboard - Sanggar',

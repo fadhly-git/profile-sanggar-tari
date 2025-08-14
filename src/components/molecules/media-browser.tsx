@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Search, Upload, Link2, Check, Image as ImageIcon } from 'lucide-react'
 import Image from 'next/image'
 import { LoadingSpinner } from '@/components/atoms/loading-spinner'
-import { isValidImageUrl } from '@/lib/validators'
+import { isValidImageUrl } from '@/lib/validator'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Separator } from '../ui/separator'
 import { toast } from 'sonner'
@@ -342,10 +342,10 @@ export function MediaBrowser({
                                             onValueChange={setUploadCategory}
                                             disabled={useCustomCategory}
                                         >
-                                            <SelectTrigger>
+                                            <SelectTrigger className='w-full'>
                                                 <SelectValue placeholder="Pilih kategori" />
                                             </SelectTrigger>
-                                            <SelectContent>
+                                            <SelectContent className='w-full'>
                                                 <SelectItem value="general">General</SelectItem>
                                                 {categories.map(cat => (
                                                     <SelectItem key={cat} value={cat}>
@@ -392,7 +392,7 @@ export function MediaBrowser({
                             </div>
 
                             {/* Upload Area */}
-                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                            <div className="border-2 border-dashed border-primary/50 rounded-lg p-8 text-center">
                                 <Upload className="mx-auto h-12 w-12 mb-4 text-muted-foreground" />
 
                                 {uploading ? (
@@ -412,12 +412,12 @@ export function MediaBrowser({
                                         />
                                         <label
                                             htmlFor="file-upload"
-                                            className="cursor-pointer text-blue-600 hover:text-blue-500 font-medium"
+                                            className="cursor-pointer text-primary/90 hover:text-primary/70 font-medium"
                                         >
                                             Klik untuk unggah atau tarik dan jatuhkan
                                         </label>
                                         <p className="text-sm text-gray-500 mt-2">
-                                            PNG, JPG, WEBP, SVG maksimal 5MB per file
+                                            PNG, JPG, WEBP maksimal 5MB per file
                                         </p>
                                     </>
                                 )}

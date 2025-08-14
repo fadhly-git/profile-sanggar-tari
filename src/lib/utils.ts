@@ -20,3 +20,47 @@ export const formatDate = (date: string | Date) => {
     year: 'numeric'
   }).format(new Date(date));
 };
+
+export function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim()
+}
+
+export function getStatusLabel(status: string): string {
+  const statusMap = {
+    DRAFT: 'Draft',
+    PUBLISHED: 'Dipublikasi',
+    ARCHIVED: 'Diarsipkan'
+  }
+  return statusMap[status as keyof typeof statusMap] || status
+}
+
+export function getStatusVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
+  const variantMap = {
+    DRAFT: 'outline' as const,
+    PUBLISHED: 'default' as const,
+    ARCHIVED: 'secondary' as const
+  }
+  return variantMap[status as keyof typeof variantMap] || 'outline'
+}
+
+export function createExcerpt(content: string, maxLength: number = 100): string {
+  // Remove HTML tags if any
+  const cleanContent = content.replace(/<[^>]*>/g, '');
+
+  if (cleanContent.length <= maxLength) {
+    return cleanContent;
+  }
+
+  // Cut at word boundary
+  const truncated = cleanContent.substring(0, maxLength);
+  const lastSpaceIndex = truncated.lastIndexOf(' ');
+
+  return lastSpaceIndex > 0
+    ? truncated.substring(0, lastSpaceIndex) + '...'
+    : truncated + '...';
+}

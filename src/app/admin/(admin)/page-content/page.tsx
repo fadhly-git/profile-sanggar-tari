@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import Link from "next/link"
 import { getPageContents } from "@/lib/page-content/actions"
-import { PageContentTable } from "@/components/page-content/page-content-table"
-import { PageContentMobile } from "@/components/page-content/page-content-mobile"
+import { PageContentTable } from "@/components/admin/page-content/page-content-table"
+import { PageContentMobile } from "@/components/admin/page-content/page-content-mobile"
 
 function LoadingSkeleton() {
     return (

@@ -5,7 +5,7 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
-import Link from '@tiptap/extension-link'
+import { Link as LinkEditor } from '@tiptap/extension-link'
 import TextAlign from '@tiptap/extension-text-align'
 import { TextStyle } from '@tiptap/extension-text-style'
 import Color from '@tiptap/extension-color'
@@ -196,7 +196,7 @@ export function RichTextEditor({ content, onChange, onImageDelete }: RichTextEdi
                     class: 'max-w-full h-auto rounded-lg',
                 },
             }),
-            Link.configure({
+            LinkEditor.configure({
                 openOnClick: false,
                 HTMLAttributes: {
                     class: 'text-blue-500 hover:text-blue-700 underline',
