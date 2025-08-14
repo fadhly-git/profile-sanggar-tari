@@ -2,11 +2,10 @@
 
 import * as React from "react"
 import {
-  ChartNoAxesCombinedIcon,
+  Calendar,
   DatabaseBackup,
-  Folders,
-  Hospital,
-  ImageIcon,
+  FileText,
+  HelpCircle,
   Images,
   LayoutDashboard,
   MessageSquareWarning,
@@ -40,99 +39,51 @@ const data = {
       isActive: true,
     },
     {
-      title: "Kritik & Saran",
-      url: "/admin/kritik-saran",
-      icon: MessageSquareWarning,
-      isActive: true,
-    },
-    {
-      title: "Kategori",
-      url: "/admin/kategori",
-      icon: Folders,
-    },
-    {
-      title: "Berita",
-      url: "/admin/berita",
+      title: "Artikel & Blog",
+      url: "/admin/articles",
       icon: NewspaperIcon,
     },
     {
-      title: "Hero Section / Banner",
-      url: "/admin/hero-section-or-banner",
-      icon: ImageIcon,
+      title: "Galeri Media",
+      url: "/admin/gallery",
+      icon: Images,
     },
     {
-      title: "Indikator Mutu",
-      url: "/admin/indikator-mutu",
-      icon: ChartNoAxesCombinedIcon,
+      title: "Jadwal Kegiatan",
+      url: "/admin/schedule-events",
+      icon: Calendar,
+    },
+    {
+      title: "FAQ",
+      url: "/admin/faq",
+      icon: HelpCircle,
+    },
+    {
+      title: "Pesan Kontak",
+      url: "/admin/contact-submissions",
+      icon: MessageSquareWarning,
     },
     {
       title: "Manajemen Pengguna",
-      url: "#",
+      url: "/admin/users",
       icon: SquareUser,
-      items: [
-        {
-          title: "User",
-          url: "/admin/user-management",
-        },
-      ],
     },
     {
-      title: "Konfigurasi Website",
-      url: "#",
+      title: "Konten Halaman",
+      url: "/admin/page-content",
+      icon: FileText,
+    },
+    {
+      title: "Pengaturan Website",
+      url: "/admin/settings",
       icon: Settings2,
-      items: [
-        {
-          title: "Website Settings",
-          url: "/admin/website-settings",
-        },
-        {
-          title: "Tentang Kami",
-          url: "/admin/tentang-kami",
-        },
-        {
-          title: "Promosi",
-          url: "/admin/promosi",
-        },
-        {
-          title: "Layanan",
-          url: "/admin/layanan",
-        },
-        {
-          title: "Halaman",
-          url: "/admin/halaman",
-        },
-      ],
-    },
-    {
-      title: "Manajemen Dokter",
-      url: "#",
-      icon: Hospital,
-      items: [
-        {
-          title: "Data Dokter",
-          url: "/admin/data-dokter",
-        },
-        {
-          title: "Jadwal Dokter",
-          url: "/admin/jadwal-dokter",
-        },
-        {
-          title: "Kategori Spesialis",
-          url: "/admin/kategori-spesialis",
-        },
-      ]
     },
   ],
   navSecondary: [
     {
-      title: "cache",
+      title: "Cache",
       url: "/admin/cache",
       icon: DatabaseBackup,
-    },
-    {
-      title: "Galeri",
-      url: "/admin/media",
-      icon: Images,
     },
     {
       title: "Feedback",
@@ -141,7 +92,6 @@ const data = {
     },
   ],
 }
-
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & { appName?: string }
 
 export function AppSidebar(props: AppSidebarProps) {

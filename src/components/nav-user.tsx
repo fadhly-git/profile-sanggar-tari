@@ -26,7 +26,7 @@ import {
 import { useSession, signOut } from "next-auth/react"
 import { type User } from "@/types"
 import { getInitialName } from "@/lib/utils"
-import { Role } from "@/generated/prisma"
+import { Role } from "@prisma/client"
 
 export function NavUser() {
   const { isMobile } = useSidebar()

@@ -3,6 +3,16 @@ export interface BreadcrumbItem {
     href: string;
 }
 
+export interface MediaFile {
+    name: string
+    path: string
+    url: string
+    size: number
+    type: string
+    lastModified: Date
+    category: string
+}
+
 export type Role = 'ADMIN' | 'SUPER_ADMIN';
 
 export interface User {
