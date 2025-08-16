@@ -1,16 +1,14 @@
-// src/middleware.ts
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
 export default withAuth(
     function middleware(req) {
         const { pathname } = req.nextUrl;
-        
+
         // SKIP middleware untuk static files dan uploads
         if (
-            pathname.startsWith('/uploads/') || 
+            pathname.startsWith('/uploads/') ||
             pathname.startsWith('/_next/') ||
-            pathname.startsWith('/api/') ||
             pathname.includes('.png') ||
             pathname.includes('.jpg') ||
             pathname.includes('.jpeg') ||
@@ -24,12 +22,21 @@ export default withAuth(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const token = (req as any).nextauth?.token;
 
+        // Redirect logged-in users away from login page
         if (pathname === "/admin/login" && token) {
             return NextResponse.redirect(new URL("/admin/dashboard", req.url));
         }
 
+        // Redirect logged-in users accessing /admin to dashboard
         if (pathname === "/admin" && token) {
             return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+        }
+
+        // Protect /api/admin endpoints
+        if (pathname.startsWith('/api/admin')) {
+            if (!token) {
+                return NextResponse.json({ message: "Unauthorized access" }, { status: 401 });
+            }
         }
 
         return NextResponse.next();
@@ -38,17 +45,17 @@ export default withAuth(
         callbacks: {
             authorized: ({ token, req }) => {
                 const { pathname } = req.nextUrl;
-                
-                // Allow access ke uploads dan static files
+
+                // Allow access to uploads and static files
                 if (pathname.startsWith('/uploads/') || pathname.startsWith('/_next/')) {
                     return true;
                 }
-                
-                // Untuk admin pages, require token
-                if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+
+                // Require token for admin pages and API
+                if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
                     return !!token;
                 }
-                
+
                 return true;
             }
         },
@@ -60,8 +67,9 @@ export default withAuth(
 
 export const config = {
     matcher: [
-        // EXCLUDE static files dan uploads dari middleware
+        // Protect admin pages and API endpoints
         "/((?!_next/static|_next/image|uploads|favicon.ico|.*\\.(?:jpg|jpeg|gif|png|svg|ico|webp)$).*)",
         "/admin/:path*",
+        "/api/admin/:path*",
     ],
 };

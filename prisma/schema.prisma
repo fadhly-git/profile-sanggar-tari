@@ -24,9 +24,10 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  articles       Article[]
-  galleryItems   GalleryItem[]
-  scheduleEvents ScheduleEvent[]
+  articles          Article[]
+  galleryItems      GalleryItem[]
+  galleryCategories GalleryCategory[]
+  scheduleEvents    ScheduleEvent[]
 
   @@map("users")
 }
@@ -62,6 +63,25 @@ enum ArticleStatus {
   ARCHIVED
 }
 
+// Model untuk Kategori Gallery
+model GalleryCategory {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?  @db.Text
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  authorId String
+  author   User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  items    GalleryItem[] // relasi one-to-many
+
+  @@map("gallery_categories")
+}
+
 // Model untuk Galeri
 model GalleryItem {
   id          String    @id @default(cuid())
@@ -69,12 +89,15 @@ model GalleryItem {
   description String?   @db.Text
   imageUrl    String
   type        MediaType @default(IMAGE)
-  category    String?
+  order       Int       @default(0) // untuk mengatur urutan dalam kategori
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   // Relations
+  categoryId String?
+  category   GalleryCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
   authorId String
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
@@ -93,7 +116,7 @@ model ScheduleEvent {
   description   String?        @db.Text
   startDate     DateTime
   endDate       DateTime?
-  location      String?
+  location      String?        @db.LongText
   isRecurring   Boolean        @default(false)
   recurringType RecurringType?
   isActive      Boolean        @default(true)

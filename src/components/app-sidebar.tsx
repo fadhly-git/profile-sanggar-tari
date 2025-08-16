@@ -45,8 +45,20 @@ const data = {
     },
     {
       title: "Galeri Media",
-      url: "/admin/gallery",
+      url: "#",
       icon: Images,
+      items: [
+        {
+          title: "Kategori Galeri",
+          url: "/admin/gallery/gallery-categories",
+          icon: Images,
+        },
+        {
+          title: "Galeri",
+          url: "/admin/gallery/media-gallery",
+          icon: Images,
+        }
+      ]
     },
     {
       title: "Jadwal Kegiatan",

@@ -124,7 +124,7 @@ const CustomImage = Image.extend({
                             const formData = new FormData()
                             formData.append('file', file)
 
-                            const response = await fetch('/api/admin/upload/image/berita', {
+                            const response = await fetch('/api/admin/media/upload/', {
                                 method: 'POST',
                                 body: formData,
                                 credentials: 'include',
@@ -297,7 +297,7 @@ export function RichTextEditor({ content, onChange, onImageDelete }: RichTextEdi
             const formData = new FormData()
             formData.append('file', file)
 
-            const response = await fetch('/api/admin/upload/image/berita', {
+            const response = await fetch('/api/admin/media/upload', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include',
