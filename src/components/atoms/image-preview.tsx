@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { X, Eye, AlertCircle } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { isValidImageUrl } from '@/lib/validator'
+import { LoadingSpinner } from './loading-spinner'
 
 interface ImagePreviewProps {
     src: string
@@ -16,7 +17,10 @@ interface ImagePreviewProps {
 export function ImagePreview({ src, alt, onRemove, className = "" }: ImagePreviewProps) {
     const [imageError, setImageError] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
+    const [dialogImageError, setDialogImageError] = useState(false)
+    const [isDialogLoading, setIsDialogLoading] = useState(true)
 
+    // Handler untuk preview image (yang kecil)
     const handleImageError = () => {
         setImageError(true)
         setIsLoading(false)
@@ -25,6 +29,23 @@ export function ImagePreview({ src, alt, onRemove, className = "" }: ImagePrevie
     const handleImageLoad = () => {
         setIsLoading(false)
         setImageError(false)
+    }
+
+    // Handler untuk dialog image (yang besar)
+    const handleDialogImageError = () => {
+        setDialogImageError(true)
+        setIsDialogLoading(false)
+    }
+
+    const handleDialogImageLoad = () => {
+        setIsDialogLoading(false)
+        setDialogImageError(false)
+    }
+
+    // Reset dialog loading state ketika dialog dibuka
+    const handleDialogOpen = () => {
+        setIsDialogLoading(true)
+        setDialogImageError(false)
     }
 
     if (imageError) {
@@ -53,9 +74,10 @@ export function ImagePreview({ src, alt, onRemove, className = "" }: ImagePrevie
     return (
         <div className={`relative group ${className}`}>
             <div className="relative aspect-square w-24 h-24 border rounded-lg overflow-hidden">
+                {/* Loading state hanya untuk preview kecil */}
                 {isLoading && (
                     <div className="absolute inset-0 bg-gray-100 animate-pulse flex items-center justify-center">
-                        <div className="text-xs text-gray-500">Loading...</div>
+                        <LoadingSpinner className='text-primary/90'/>
                     </div>
                 )}
 
@@ -73,10 +95,10 @@ export function ImagePreview({ src, alt, onRemove, className = "" }: ImagePrevie
                     <div className="text-red-500 text-sm text-center">Invalid image URL</div>
                 )}
 
-                {/* Overlay buttons */}
+                {/* Overlay buttons - tampil ketika preview sudah load */}
                 {!isLoading && !imageError && (
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center gap-2">
-                        <Dialog>
+                        <Dialog onOpenChange={(open) => open && handleDialogOpen()}>
                             <DialogTrigger asChild>
                                 <Button
                                     size="sm"
@@ -94,16 +116,35 @@ export function ImagePreview({ src, alt, onRemove, className = "" }: ImagePrevie
                                     </div>
                                 </DialogTitle>
                                 <div className="relative aspect-video rounded-lg">
+                                    {/* Loading state untuk dialog */}
+                                    {isDialogLoading && (
+                                        <div className="absolute inset-0 bg-gray-100 animate-pulse flex items-center justify-center rounded-lg">
+                                            <LoadingSpinner className='text-green-600'/>
+                                        </div>
+                                    )}
+
                                     {isValidImageUrl(src) ? (
                                         <Image
                                             src={src}
                                             alt={alt}
                                             fill
                                             className="object-contain rounded-lg"
-                                            onError={handleImageError}
+                                            onError={handleDialogImageError}
+                                            onLoad={handleDialogImageLoad}
+                                            style={{ display: isDialogLoading ? 'none' : 'block' }}
                                         />
                                     ) : (
                                         <div className="text-red-500 text-sm">Invalid image URL</div>
+                                    )}
+
+                                    {/* Error state untuk dialog */}
+                                    {dialogImageError && (
+                                        <div className="absolute inset-0 bg-red-50 border-2 border-red-200 border-dashed rounded-lg flex items-center justify-center">
+                                            <div className="text-center text-red-600">
+                                                <AlertCircle className="h-8 w-8 mx-auto mb-2" />
+                                                <p className="text-sm font-medium">Failed to load image</p>
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
                                 <DialogDescription className="mt-2 text-sm">

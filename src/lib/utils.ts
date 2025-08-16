@@ -13,6 +13,19 @@ export function getInitialName(user?: User): string {
   return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 }
 
+export function formatDateTime(date: Date | string): string {
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+
+  return new Intl.DateTimeFormat('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Jakarta'
+  }).format(dateObj)
+}
+
 export const formatDate = (date: string | Date) => {
   return new Intl.DateTimeFormat('id-ID', {
     day: 'numeric',
@@ -20,6 +33,16 @@ export const formatDate = (date: string | Date) => {
     year: 'numeric'
   }).format(new Date(date));
 };
+
+export function formatTime(date: Date | string): string {
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+
+  return new Intl.DateTimeFormat('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Jakarta'
+  }).format(dateObj)
+}
 
 export function generateSlug(title: string): string {
   return title

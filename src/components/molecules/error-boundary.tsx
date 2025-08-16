@@ -57,7 +57,7 @@ function DefaultErrorFallback({ error, reset }: { error: Error; reset: () => voi
                 Coba Lagi
             </Button>
             {process.env.NODE_ENV === 'development' && (
-                <details className="mt-4 text-sm text-gray-500">
+                <details className="container max-w-7xl mt-4 text-sm text-gray-500">
                     <summary className="cursor-pointer">Detail Error</summary>
                     <pre className="mt-2 p-4 bg-gray-100 dark:bg-gray-800 rounded text-xs overflow-auto">
                         {error.message}

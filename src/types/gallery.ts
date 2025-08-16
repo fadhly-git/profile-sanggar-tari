@@ -1,11 +1,23 @@
 // @/types/gallery.ts
+
+export interface GalleryCategory {
+  id: string
+  title: string
+  slug: string
+  description: string | null
+  order: number
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface GalleryItem {
   id: string
   title: string
   description: string | null
   imageUrl: string
   type: 'IMAGE' | 'VIDEO'
-  category: string | null
+  categoryId: string | null
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -15,14 +27,17 @@ export interface GalleryItem {
     name: string
     email: string
   }
+
+  category?: GalleryCategory | null
 }
+
 
 export interface CreateGalleryItem {
   title: string
   description?: string | null
   imageUrl: string
   type: 'IMAGE' | 'VIDEO'
-  category?: string | null
+  categoryId: string | null
   isActive: boolean
   authorId: string
 }

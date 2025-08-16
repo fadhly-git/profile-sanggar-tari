@@ -4,15 +4,24 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { CreateGalleryItem, UpdateGalleryItem } from '@/types/gallery'
+import { MediaType } from '@prisma/client'
 
 export async function createGalleryItem(data: CreateGalleryItem) {
     try {
-        const item = await prisma.galleryItem.create({
-            data,
+        const galleryItem = await prisma.galleryItem.create({
+            data: {
+                title: data.title,
+                description: data.description,
+                imageUrl: data.imageUrl,
+                type: data.type as MediaType,
+                categoryId: data.categoryId,  // Ubah dari 'category' ke 'categoryId'
+                isActive: data.isActive,
+                authorId: data.authorId
+            },
             include: {
+                category: true,  // Include kategori dalam response
                 author: {
                     select: {
-                        id: true,
                         name: true,
                         email: true
                     }
@@ -20,8 +29,8 @@ export async function createGalleryItem(data: CreateGalleryItem) {
             }
         })
 
-        revalidatePath('/admin/gallery')
-        return { success: true, data: item }
+        revalidatePath('/admin/gallery/')
+        return { success: true, data: galleryItem }
     } catch (error) {
         console.error('Error creating gallery item:', error)
         return { success: false, error: 'Gagal membuat item galeri' }
@@ -30,11 +39,19 @@ export async function createGalleryItem(data: CreateGalleryItem) {
 
 export async function updateGalleryItem(data: UpdateGalleryItem) {
     try {
-        const { id, ...updateData } = data
+        const { id } = data
         const item = await prisma.galleryItem.update({
             where: { id },
-            data: updateData,
+            data: {
+                title: data.title,
+                description: data.description,
+                imageUrl: data.imageUrl,
+                type: data.type,
+                categoryId: data.categoryId ?? undefined,  // Ubah dari 'category' ke 'categoryId'
+                isActive: data.isActive
+            },
             include: {
+                category: true,  // Include kategori dalam response
                 author: {
                     select: {
                         id: true,
@@ -96,6 +113,7 @@ export async function getGalleryItemById(id: string) {
         const item = await prisma.galleryItem.findUnique({
             where: { id },
             include: {
+                category: true,  // Include kategori dalam response
                 author: {
                     select: {
                         id: true,
