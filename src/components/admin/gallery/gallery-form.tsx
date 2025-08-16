@@ -15,7 +15,7 @@ import { ImageSelector } from '@/components/molecules/image-selector'
 import { Separator } from '@/components/ui/separator'
 import { Save, ArrowLeft, Image as ImageIcon } from 'lucide-react'
 import { toast } from 'sonner'
-import { GalleryItem, CreateGalleryItem, UpdateGalleryItem } from '@/types/gallery'
+import { GalleryItem, CreateGalleryItem, UpdateGalleryItem, GalleryCategory } from '@/types/gallery'
 import { createGalleryItem, updateGalleryItem } from '@/lib/actions/gallery-actions'
 import Image from 'next/image'
 
@@ -23,9 +23,10 @@ interface GalleryFormProps {
     item?: GalleryItem
     mode: 'create' | 'edit'
     userId: string
+    categories?: GalleryCategory[]
 }
 
-export function GalleryForm({ item, mode, userId }: GalleryFormProps) {
+export function GalleryForm({ item, mode, userId, categories }: GalleryFormProps) {
     const router = useRouter()
     const [isPending, startTransition] = useTransition()
 
@@ -34,7 +35,7 @@ export function GalleryForm({ item, mode, userId }: GalleryFormProps) {
         description: item?.description || '',
         imageUrl: item?.imageUrl || '',
         type: (item?.type || 'IMAGE') as 'IMAGE' | 'VIDEO',
-        category: item?.category || '',
+        categoryId: item?.categoryId || '',
         isActive: item?.isActive ?? true
     })
 
@@ -73,7 +74,7 @@ export function GalleryForm({ item, mode, userId }: GalleryFormProps) {
                         description: formData.description.trim() || null,
                         imageUrl: formData.imageUrl,
                         type: formData.type,
-                        category: formData.category.trim() || null,
+                        categoryId: formData.categoryId.trim() || null,
                         isActive: formData.isActive,
                         authorId: userId
                     }
@@ -85,7 +86,7 @@ export function GalleryForm({ item, mode, userId }: GalleryFormProps) {
                         description: formData.description.trim() || null,
                         imageUrl: formData.imageUrl,
                         type: formData.type,
-                        category: formData.category.trim() || null,
+                        categoryId: formData.categoryId.trim() || null,
                         isActive: formData.isActive
                     }
                     result = await updateGalleryItem(updateData)
@@ -97,11 +98,11 @@ export function GalleryForm({ item, mode, userId }: GalleryFormProps) {
                             ? 'Item galeri berhasil dibuat'
                             : 'Item galeri berhasil diperbarui'
                     )
-                    router.push('/admin/gallery')
+                    router.push('/admin/gallery/media-gallery')
                 } else {
                     toast.error(result.error)
                 }
-            } catch (error) {
+            } catch {
                 toast.error('Terjadi kesalahan, silakan coba lagi')
             }
         })
@@ -114,12 +115,13 @@ export function GalleryForm({ item, mode, userId }: GalleryFormProps) {
         }
     }
 
-    const handleInputChange = (field: string, value: string) => {
-        setFormData(prev => ({ ...prev, [field]: value }))
-        if (errors[field]) {
-            setErrors(prev => ({ ...prev, [field]: '' }))
-        }
-    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleInputChange = (field: keyof any, value: any) => {
+    setFormData(prev => ({
+        ...prev,
+        [field]: value
+    }))
+}
 
     return (
         <div className="space-y-6">
@@ -173,13 +175,32 @@ export function GalleryForm({ item, mode, userId }: GalleryFormProps) {
                                     helperText="Deskripsi akan ditampilkan di detail item"
                                 />
 
-                                <Input
-                                    label="Kategori"
-                                    value={formData.category}
-                                    onChange={(e) => handleInputChange('category', e.target.value)}
-                                    placeholder="Masukkan kategori (opsional)"
-                                    helperText="Contoh: Wisata, Kuliner, Budaya"
-                                />
+                                <div>
+                                    <Label className="text-sm font-medium">Kategori</Label>
+                                    <Select
+                                        value={formData.categoryId || undefined}
+                                        onValueChange={(value) => handleInputChange('categoryId', value || null)}
+                                    >
+                                        <SelectTrigger className="mt-2">
+                                            <SelectValue placeholder="Pilih kategori (opsional)" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="null">Tanpa Kategori</SelectItem>
+                                            {(categories ?? [])
+                                                .filter(cat => cat.isActive)
+                                                .sort((a, b) => a.order - b.order)
+                                                .map((category) => (
+                                                    <SelectItem key={category.id} value={category.id}>
+                                                        {category.title}
+                                                    </SelectItem>
+                                                ))
+                                            }
+                                        </SelectContent>
+                                    </Select>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                        Pilih kategori untuk mengelompokkan item galeri
+                                    </p>
+                                </div>
                             </CardContent>
                         </Card>
 
@@ -204,7 +225,6 @@ export function GalleryForm({ item, mode, userId }: GalleryFormProps) {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="IMAGE">Gambar</SelectItem>
-                                            <SelectItem value="VIDEO">Video</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -250,9 +270,12 @@ export function GalleryForm({ item, mode, userId }: GalleryFormProps) {
                                             <Image
                                                 src={formData.imageUrl}
                                                 alt="Preview"
+                                                width={500}
+                                                height={500}
+                                                loading='lazy'
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {
-                                                    e.currentTarget.src = '/placeholder-image.png'
+                                                    console.error('Error loading image:', e);
                                                 }}
                                             />
                                         </div>

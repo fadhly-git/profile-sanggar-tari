@@ -41,7 +41,11 @@ export default function GalleryPage() {
         const result = await getGalleryItems()
 
         if (result.success) {
-            setItems(result.data ?? [])
+            setItems(
+                (result.data ?? []).map(item => ({
+                    ...item
+                }))
+            )
         } else {
             toast.error(result.error)
         }
@@ -58,7 +62,7 @@ export default function GalleryPage() {
     }
 
     const handleEdit = (item: GalleryItem) => {
-        router.push(`/admin/gallery/edit/${item.id}`)
+        router.push(`/admin/gallery/media-gallery/${item.id}/edit`)
     }
 
     const handleDelete = (item: GalleryItem) => {
@@ -106,7 +110,7 @@ export default function GalleryPage() {
                     </p>
                 </div>
 
-                <Button onClick={() => router.push('/admin/gallery/create')}>
+                <Button onClick={() => router.push('/admin/gallery/media-gallery/create')}>
                     <Plus className="mr-2 h-4 w-4" />
                     Tambah Item
                 </Button>
@@ -147,6 +151,7 @@ export default function GalleryPage() {
                                     onView={handleView}
                                     onEdit={handleEdit}
                                     onDelete={handleDelete}
+                                    key={row.original.id}
                                 >
                                     {children}
                                 </GalleryContextMenu>

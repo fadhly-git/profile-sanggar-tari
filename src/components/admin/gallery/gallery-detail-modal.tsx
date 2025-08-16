@@ -24,7 +24,7 @@ export function GalleryDetailModal({ item, open, onClose }: GalleryDetailModalPr
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="!max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Detail Item Galeri</DialogTitle>
                 </DialogHeader>
@@ -34,9 +34,11 @@ export function GalleryDetailModal({ item, open, onClose }: GalleryDetailModalPr
                         <Image
                             src={item.imageUrl}
                             alt={item.title}
+                            width={800}
+                            height={400}
                             className="w-full h-full object-contain"
                             onError={(e) => {
-                                e.currentTarget.src = '/placeholder-image.png'
+                                console.error('Gagal memuat gambar:', e)
                             }}
                         />
                     </div>
@@ -60,7 +62,7 @@ export function GalleryDetailModal({ item, open, onClose }: GalleryDetailModalPr
                             </Badge>
                             {item.category && (
                                 <Badge variant="secondary">
-                                    {item.category}
+                                    {String(item.category)}
                                 </Badge>
                             )}
                         </div>

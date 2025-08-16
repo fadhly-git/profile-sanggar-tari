@@ -21,7 +21,7 @@ interface GalleryContextMenuProps {
 
 export function GalleryContextMenu({ item, children, onView, onEdit, onDelete }: GalleryContextMenuProps) {
   return (
-    <ContextMenu>
+    <ContextMenu key={item.id}>
       <ContextMenuTrigger asChild>
         {children}
       </ContextMenuTrigger>

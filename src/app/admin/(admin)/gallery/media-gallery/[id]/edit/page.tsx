@@ -1,9 +1,10 @@
 // @/app/admin/gallery/edit/[id]/page.tsx
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { GalleryForm } from '@/components/admin/gallery/gallery-form'
 import { getGalleryItemById } from '@/lib/actions/gallery-actions'
 import { authOptions } from '@/lib/auth-options'
 import { getServerSession } from 'next-auth'
+import { getActiveGalleryCategories } from '@/lib/actions/gallery-category-actions'
 
 interface EditGalleryPageProps {
     params: {
@@ -18,11 +19,13 @@ export default async function EditGalleryPage({ params }: EditGalleryPageProps) 
         return <div>Unauthorized</div>
     }
 
-    const result = await getGalleryItemById(params.id)
-
-    if (!result.success || !result.data) {
+    const [item, categories] = await Promise.all([
+        getGalleryItemById(params.id),
+        getActiveGalleryCategories()  // Fetch kategori aktif
+    ])
+    if (!item.success || !item.data) {
         notFound()
     }
 
-    return <GalleryForm mode="edit" item={result.data} userId={session.user.id} />
+    return <GalleryForm mode="edit" item={item.data} userId={session.user.id} categories={categories} />
 }

@@ -34,9 +34,12 @@ export const createGalleryColumns = ({ onView, onEdit, onDelete }: ColumnProps):
           <Image
             src={imageUrl}
             alt={row.original.title}
+            loading="lazy"
+            width={64}
+            height={64}
             className="w-full h-full object-cover"
             onError={(e) => {
-              e.currentTarget.src = '/placeholder-image.png'
+              console.error('Image load error:', e)
             }}
           />
         </div>
@@ -53,7 +56,7 @@ export const createGalleryColumns = ({ onView, onEdit, onDelete }: ColumnProps):
           <p className="font-medium truncate">{title}</p>
           {row.original.category && (
             <Badge variant="secondary" className="mt-1 text-xs">
-              {row.original.category}
+              {String(row.original.category)}
             </Badge>
           )}
         </div>
