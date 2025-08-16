@@ -141,7 +141,7 @@ export function TimePicker({
                                 value={hour.toString()}
                                 onValueChange={(value) => handleTimeChange(parseInt(value), minute, period)}
                             >
-                                <SelectTrigger className="w-16">
+                                <SelectTrigger className="w-24">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -172,7 +172,7 @@ export function TimePicker({
                                 value={minute.toString()}
                                 onValueChange={(value) => handleTimeChange(hour, parseInt(value), period)}
                             >
-                                <SelectTrigger className="w-16">
+                                <SelectTrigger className="w-24">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -189,7 +189,7 @@ export function TimePicker({
                                     value={period}
                                     onValueChange={(value) => handleTimeChange(hour, minute, value)}
                                 >
-                                    <SelectTrigger className="w-16">
+                                    <SelectTrigger className="w-24">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
