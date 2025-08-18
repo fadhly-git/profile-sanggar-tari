@@ -13,7 +13,6 @@ import { createScheduleEvent, updateScheduleEvent } from '@/lib/actions/schedule
 import { ScheduleEvent, ScheduleFormData } from '@/types/schedule'
 import { RecurringType } from '@prisma/client'
 import { toast } from 'sonner'
-import { DatePicker } from '@/components/molecules/date-picker'
 import { DateTimePicker } from '@/components/molecules/datetime-picker'
 
 interface ScheduleFormProps {
