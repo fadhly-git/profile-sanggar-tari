@@ -67,7 +67,7 @@ const data = {
     },
     {
       title: "FAQ",
-      url: "/admin/faq",
+      url: "/admin/faqs",
       icon: HelpCircle,
     },
     {
