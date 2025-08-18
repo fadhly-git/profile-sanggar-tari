@@ -124,36 +124,38 @@ export function FAQManagement({ initialData }: FAQManagementProps) {
                 </CardHeader>
 
                 <CardContent className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                        <div className="relative flex-1 max-w-sm">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                            <Input
-                                placeholder="Cari FAQ..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10"
-                            />
-                        </div>
-                    </div>
 
                     {isMobile ? (
-                        <div className="space-y-4">
-                            {filteredFAQs.length === 0 ? (
-                                <div className="text-center py-8 text-muted-foreground">
-                                    {searchQuery ? 'Tidak ada FAQ yang sesuai dengan pencarian' : 'Belum ada FAQ'}
-                                </div>
-                            ) : (
-                                filteredFAQs.map((faq) => (
-                                    <FAQMobileCard
-                                        key={faq.id}
-                                        faq={faq}
-                                        onView={handleView}
-                                        onEdit={handleEdit}
-                                        onDelete={handleDelete}
+                        <>
+                            <div className="flex items-center space-x-2">
+                                <div className="relative flex-1 max-w-sm">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                                    <Input
+                                        placeholder="Cari FAQ..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="pl-10"
                                     />
-                                ))
-                            )}
-                        </div>
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                {filteredFAQs.length === 0 ? (
+                                    <div className="text-center py-8 text-muted-foreground">
+                                        {searchQuery ? 'Tidak ada FAQ yang sesuai dengan pencarian' : 'Belum ada FAQ'}
+                                    </div>
+                                ) : (
+                                    filteredFAQs.map((faq) => (
+                                        <FAQMobileCard
+                                            key={faq.id}
+                                            faq={faq}
+                                            onView={handleView}
+                                            onEdit={handleEdit}
+                                            onDelete={handleDelete}
+                                        />
+                                    ))
+                                )}
+                            </div>
+                        </>
                     ) : (
                         <DataTable
                             columns={faqColumns}

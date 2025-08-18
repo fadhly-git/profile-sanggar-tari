@@ -7,13 +7,8 @@ import { StatusBadge } from '@/components/atoms/badge-status'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Eye, Edit, Trash2 } from 'lucide-react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 interface FAQMobileCardProps {
     faq: FAQ
@@ -25,7 +20,7 @@ interface FAQMobileCardProps {
 export function FAQMobileCard({ faq, onView, onEdit, onDelete }: FAQMobileCardProps) {
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild>
                 <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="pb-3">
                         <div className="flex items-start justify-between gap-2">
@@ -60,7 +55,7 @@ export function FAQMobileCard({ faq, onView, onEdit, onDelete }: FAQMobileCardPr
                 </Card>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent>
+            <DropdownMenuContent className="w-48">
                 <DropdownMenuItem onClick={() => onView(faq)}>
                     <Eye className="mr-2 h-4 w-4" />
                     Lihat Detail
