@@ -1,20 +1,25 @@
 // lib/authOptions.ts
 import type { AuthOptions } from "next-auth";
-import { User } from "next-auth";
+import { getServerSession, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
 
+import "next-auth"
+
 declare module "next-auth" {
     interface Session {
         user: {
-            id: string;
-            email?: string | null;
-            name?: string | null;
-            image?: string | null;
-        };
-        expires: string;
+            id: string
+            email?: string | null
+            name?: string | null
+            role?: string
+        }
+    }
+
+    interface User {
+        role?: string
     }
 }
 
@@ -38,6 +43,7 @@ export const authOptions: AuthOptions = {
                         email: true,
                         name: true,
                         password: true,
+                        role: true
                     }
                 });
 
@@ -55,6 +61,7 @@ export const authOptions: AuthOptions = {
                     id: user.id.toString(),
                     email: user.email,
                     name: user.name,
+                    role: user.role || "ADMIN", // Default role if not provided
                     rememberMe: credentials.rememberMe === "true"
                 } as User & { rememberMe: boolean };
             }
@@ -72,6 +79,7 @@ export const authOptions: AuthOptions = {
                 token.id = user.id;
                 token.email = user.email || "";
                 token.name = user.name || "";
+                token.role = user.role || "ADMIN"; // Default role if not provided
                 token.rememberMe = userWithRemember.rememberMe || false;
 
                 const now = Math.floor(Date.now() / 1000);
@@ -88,7 +96,7 @@ export const authOptions: AuthOptions = {
                 session.user.id = token.id as string;
                 session.user.email = token.email as string;
                 session.user.name = token.name as string;
-                session.user.image = token.gambar as string;
+                session.user.role = token.role as string;
 
                 if (token.exp && typeof token.exp === 'number') {
                     session.expires = new Date(token.exp * 1000).toISOString();
@@ -98,3 +106,5 @@ export const authOptions: AuthOptions = {
         }
     }
 };
+
+export const auth = () => getServerSession(authOptions);
