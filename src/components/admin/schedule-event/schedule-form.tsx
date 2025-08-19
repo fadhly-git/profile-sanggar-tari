@@ -13,7 +13,6 @@ import { createScheduleEvent, updateScheduleEvent } from '@/lib/actions/schedule
 import { ScheduleEvent, ScheduleFormData } from '@/types/schedule'
 import { RecurringType } from '@prisma/client'
 import { toast } from 'sonner'
-import { DatePicker } from '@/components/molecules/date-picker'
 import { DateTimePicker } from '@/components/molecules/datetime-picker'
 
 interface ScheduleFormProps {
@@ -137,7 +136,7 @@ export function ScheduleForm({ event, onSuccess, authorId }: ScheduleFormProps) 
                     {event ? 'Edit Jadwal Kegiatan' : 'Tambah Jadwal Kegiatan'}
                 </CardTitle>
             </CardHeader>
-            <CardContent className='!max-w-2xl mx-auto'>
+            <CardContent className='max-w-2xl mx-auto'>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <Input
                         label="Judul Kegiatan"
@@ -164,7 +163,7 @@ export function ScheduleForm({ event, onSuccess, authorId }: ScheduleFormProps) 
                                 Tanggal & Waktu Mulai
                             </Label>
                             <DateTimePicker
-                                datetime={formData.startDate ? new Date(formData.startDate) : undefined}
+                                dateTime={formData.startDate ? new Date(formData.startDate) : undefined}
                                 onDateTimeChange={(datetime) => handleInputChange('startDate', datetime ? datetime.toISOString().slice(0, 16) : '')}
                                 error={errors.startDate}
                                 format12h={false}
@@ -178,7 +177,7 @@ export function ScheduleForm({ event, onSuccess, authorId }: ScheduleFormProps) 
                                 Tanggal & Waktu Selesai
                             </Label>
                             <DateTimePicker
-                                datetime={formData.endDate ? new Date(formData.endDate) : undefined}
+                                dateTime={formData.endDate ? new Date(formData.endDate) : undefined}
                                 onDateTimeChange={(datetime) => handleInputChange('endDate', datetime ? datetime.toISOString().slice(0, 16) : '')}
                                 error={errors.endDate}
                                 format12h={false}

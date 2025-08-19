@@ -151,16 +151,23 @@ model FAQ {
 
 // Model untuk Contact Form Submissions
 model ContactSubmission {
-  id        String   @id @default(cuid())
-  name      String
-  email     String
-  phone     String?
-  subject   String
-  message   String   @db.LongText
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id           String        @id @default(cuid())
+  name         String
+  email        String
+  subject      String
+  message      String        @db.LongText
+  status       ContactStatus @default(PENDING)
+  repliedAt    DateTime?
+  replyMessage String?       @db.LongText
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   @@map("contact_submissions")
+}
+
+enum ContactStatus {
+  PENDING
+  REPLIED
 }
 
 // Model untuk Settings Website

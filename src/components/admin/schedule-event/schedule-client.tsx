@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Plus, Calendar, Filter } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { DataTable } from '@/components/molecules/data-table'
 import { ScheduleForm } from '@/components/admin/schedule-event/schedule-form'
@@ -101,7 +101,7 @@ export function ScheduleClientPage({ currentUserId, data }: SchedulePageProps) {
             </ContextMenuContent>
         </ContextMenu>
     )
-
+    console.log(isFormOpen)
     return (
         <div className="container mx-auto px-4 py-8 space-y-6">
             {/* Header */}
@@ -116,29 +116,10 @@ export function ScheduleClientPage({ currentUserId, data }: SchedulePageProps) {
                     </p>
                 </div>
 
-                <Dialog open={isFormOpen} onOpenChange={handleCloseForm}>
-                    <DialogTrigger asChild>
-                        <Button onClick={() => setIsFormOpen(true)}>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Tambah Jadwal
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="!max-w-3xl max-h-[90vh] overflow-auto">
-                        <DialogHeader>
-                            <DialogTitle>
-                                {editingEvent ? 'Edit Jadwal Kegiatan' : 'Tambah Jadwal Kegiatan'}
-                            </DialogTitle>
-                        </DialogHeader>
-                        <ScheduleForm
-                            event={editingEvent ?? undefined}
-                            onSuccess={handleFormSuccess}
-                            authorId={currentUserId}
-                        />
-                        <DialogDescription className="mt-4">
-                            Isi form di atas untuk menambahkan atau mengedit jadwal kegiatan.
-                        </DialogDescription>
-                    </DialogContent>
-                </Dialog>
+                <Button onClick={() => setIsFormOpen(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Tambah Jadwal
+                </Button>
             </div>
 
             {/* Stats Cards */}
@@ -274,6 +255,24 @@ export function ScheduleClientPage({ currentUserId, data }: SchedulePageProps) {
                 description="Tindakan ini tidak dapat dibatalkan dan akan menghapus jadwal secara permanen."
                 loading={isDeleting}
             />
+
+            <Dialog open={isFormOpen} onOpenChange={handleCloseForm}>
+                <DialogContent className="!max-w-2xl max-h-[90vh] overflow-auto">
+                    <DialogHeader>
+                        <DialogTitle>
+                            {editingEvent ? 'Edit Jadwal Kegiatan' : 'Tambah Jadwal Kegiatan'}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <ScheduleForm
+                        event={editingEvent ?? undefined}
+                        onSuccess={handleFormSuccess}
+                        authorId={currentUserId}
+                    />
+                    <DialogDescription className="mt-4">
+                        Isi form di atas untuk menambahkan atau mengedit jadwal kegiatan.
+                    </DialogDescription>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

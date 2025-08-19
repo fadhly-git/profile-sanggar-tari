@@ -13,6 +13,7 @@ interface ImageSelectorProps {
     onChange: (url: string) => void
     helperText?: string
     required?: boolean
+    error?: string // Optional error message
 }
 
 export function ImageSelector({
@@ -20,7 +21,8 @@ export function ImageSelector({
     value,
     onChange,
     helperText,
-    required
+    required,
+    error, // Optional error message
 }: ImageSelectorProps) {
     const handleRemove = () => {
         onChange('')
@@ -67,6 +69,9 @@ export function ImageSelector({
 
             {helperText && (
                 <p className="text-sm text-primary">{helperText}</p>
+            )}
+            {error && (
+                <p className="text-sm text-red-500">{error}</p>
             )}
         </div>
     )
