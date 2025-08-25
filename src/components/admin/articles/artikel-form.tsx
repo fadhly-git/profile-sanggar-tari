@@ -1,7 +1,6 @@
-// src/components/admin/artikel/artikel-form.tsx
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,16 +12,16 @@ import { RichTextEditor } from "@/components/editor/TiptapEditor"
 import { generateSlug } from "@/lib/utils"
 import { Article } from "./artikel-columns"
 import { ArrowLeft, Save, Eye } from "lucide-react"
-import { createArticle, updateArticle } from "@/lib/actions/articles-action"
 
 interface ArtikelFormProps {
     article?: Article
-    authorId: string // Anda perlu pass ini dari session/auth
+    authorId: string
+    onSubmit: (formData: FormData) => Promise<{ success: boolean; error?: string }>
 }
 
-export function ArtikelForm({ article, authorId }: ArtikelFormProps) {
+export function ArtikelForm({ article, authorId, onSubmit }: ArtikelFormProps) {
     const router = useRouter()
-    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isPending, startTransition] = useTransition()
     const [formData, setFormData] = useState({
         title: article?.title || '',
         slug: article?.slug || '',
@@ -35,7 +34,9 @@ export function ArtikelForm({ article, authorId }: ArtikelFormProps) {
 
     // Auto generate slug dari title
     useEffect(() => {
-        setFormData(prev => ({ ...prev, slug: generateSlug(formData.title) }))
+        if (!article) { // Only auto-generate for new articles
+            setFormData(prev => ({ ...prev, slug: generateSlug(formData.title) }))
+        }
     }, [formData.title, article])
 
     const validateForm = () => {
@@ -62,42 +63,36 @@ export function ArtikelForm({ article, authorId }: ArtikelFormProps) {
 
         if (!validateForm()) return
 
-        setIsSubmitting(true)
-        try {
-            const data = {
-                ...formData,
-                publishedAt: formData.status === 'PUBLISHED' ? new Date() : null,
-                authorId
-            }
-
-            if (article) {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const { author, ...articleWithoutAuthor } = article
-                const response = await updateArticle({
-                    ...articleWithoutAuthor,
-                    ...data,
-                })
-                if (!response.success) {
-                    throw new Error(response.error || 'Gagal memperbarui artikel')
+        startTransition(async () => {
+            try {
+                const form = new FormData()
+                form.append('title', formData.title)
+                form.append('slug', formData.slug)
+                form.append('excerpt', formData.excerpt || '')
+                form.append('content', formData.content)
+                form.append('featuredImage', formData.featuredImage || '')
+                form.append('status', formData.status)
+                form.append('authorId', authorId)
+                
+                if (article) {
+                    form.append('id', article.id)
                 }
-            } else {
-                const response = await createArticle(data)
-                if (!response.success) {
-                    throw new Error(response.error || 'Gagal membuat artikel')
-                }
-            }
 
-            router.push('/admin/articles')
-        } catch (error) {
-            console.error('Error saving article:', error)
-            setErrors({ submit: 'Terjadi kesalahan saat menyimpan artikel' })
-        } finally {
-            setIsSubmitting(false)
-        }
+                const result = await onSubmit(form)
+                
+                if (result.success) {
+                    router.push('/admin/articles')
+                } else {
+                    setErrors({ submit: result.error || 'Terjadi kesalahan saat menyimpan artikel' })
+                }
+            } catch (error) {
+                console.error('Error saving article:', error)
+                setErrors({ submit: 'Terjadi kesalahan saat menyimpan artikel' })
+            }
+        })
     }
 
     const handlePreview = () => {
-        // Implement preview functionality
         window.open(`/preview/${formData.slug}`, '_blank')
     }
 
@@ -131,10 +126,10 @@ export function ArtikelForm({ article, authorId }: ArtikelFormProps) {
                     <Button
                         form="artikel-form"
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={isPending}
                     >
                         <Save className="mr-2 h-4 w-4" />
-                        {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+                        {isPending ? 'Menyimpan...' : 'Simpan'}
                     </Button>
                 </div>
             </div>
@@ -258,8 +253,6 @@ export function ArtikelForm({ article, authorId }: ArtikelFormProps) {
                         </Card>
                     </div>
                 </div>
-
-
             </form>
         </div>
     )
