@@ -24,6 +24,67 @@ export async function getAllSettings() {
     }
 }
 
+export async function getAllSettingsObj() {
+    try {
+        const settings = await prisma.setting.findMany({
+            orderBy: {
+                key: "asc",
+            },
+        })
+
+        // Convert to key-value object for easier access
+        const settingsObj = settings.reduce((acc, setting) => {
+            let value = setting.value
+
+            // Parse JSON values
+            if (setting.type === 'JSON' && setting.value) {
+                try {
+                    value = JSON.parse(setting.value)
+                } catch (e) {
+                    console.warn(`Failed to parse JSON for setting ${setting.key}`)
+                    console.error(e)
+                }
+            }
+
+            acc[setting.key] = value
+            return acc
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        }, {} as Record<string, any>)
+
+        return { success: true, data: settingsObj }
+    } catch (error) {
+        console.error("Error fetching settings:", error)
+        return { success: false, error: "Gagal mengambil data pengaturan" }
+    }
+}
+
+export async function getSettingByKey(key: string) {
+    try {
+        const setting = await prisma.setting.findUnique({
+            where: { key }
+        })
+
+        if (!setting) {
+            return { success: false, error: "Pengaturan tidak ditemukan" }
+        }
+
+        let value = setting.value
+        if (setting.type === 'JSON' && setting.value) {
+            try {
+                value = JSON.parse(setting.value)
+            } catch (e) {
+                console.warn(`Failed to parse JSON for setting ${setting.key}`)
+                console.error(e)
+            }
+        }
+
+        return { success: true, data: value }
+    } catch (error) {
+        console.error("Error fetching setting:", error)
+        return { success: false, error: "Gagal mengambil pengaturan" }
+    }
+}
+
 export async function getSettingById(id: string) {
     try {
         const setting = await prisma.setting.findUnique({
