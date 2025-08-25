@@ -103,13 +103,13 @@ export async function updatePageContent(id: string, formData: FormData) {
     })
 
     revalidatePath('/admin/page-content')
-    redirect('/admin/page-content')
+    return { success: true }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false, error: error.issues[0].message }
     }
     console.error('Error updating page content:', error)
-    return { success: false, error: 'Gagal memperbarui konten halaman' }
+    return { success: false, error: 'Gagal memperbarui konten halaman', details: error }
   }
 }
 
