@@ -3,8 +3,8 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
-import { CreateGalleryItem, UpdateGalleryItem } from '@/types/gallery'
-import { MediaType } from '@prisma/client'
+import { CreateGalleryItem, GalleryCategory, UpdateGalleryItem } from '@/types/gallery'
+import { GalleryItem, MediaType } from '@prisma/client'
 
 export async function createGalleryItem(data: CreateGalleryItem) {
     try {
@@ -132,5 +132,140 @@ export async function getGalleryItemById(id: string) {
     } catch (error) {
         console.error('Error fetching gallery item:', error)
         return { success: false, error: 'Gagal mengambil item galeri' }
+    }
+}
+
+// public gallery
+export interface GalleryItemWithCategory extends GalleryItem {
+    category: GalleryCategory | null;
+}
+
+export async function getActiveGalleryItems(categoryId?: string): Promise<GalleryItemWithCategory[]> {
+    try {
+        const items = await prisma.galleryItem.findMany({
+            where: {
+                isActive: true,
+                ...(categoryId && { categoryId }),
+            },
+            include: {
+                category: true,
+            },
+            orderBy: [
+                { order: 'asc' },
+                { createdAt: 'desc' },
+            ],
+        });
+        return items;
+    } catch (error) {
+        console.error("Error fetching gallery items:", error);
+        return [];
+    }
+}
+
+export async function getActiveGalleryCategoriesLimit(limit: number = 6) {
+    try {
+        const categories = await prisma.galleryCategory.findMany({
+            where: { isActive: true },
+            orderBy: { order: 'asc' },
+            include: {
+                items: {
+                    where: { isActive: true },
+                    orderBy: { order: 'asc' },
+                    take: limit // Limit untuk preview
+                },
+                _count: {
+                    select: {
+                        items: {
+                            where: { isActive: true }
+                        }
+                    }
+                }
+            }
+        })
+
+        return { success: true, data: categories }
+    } catch (error) {
+        console.error("Error fetching gallery categories:", error)
+        return { success: false, error: "Gagal mengambil kategori galeri" }
+    }
+}
+
+export async function getGalleryItemsByCategory(categorySlug: string) {
+    try {
+        const category = await prisma.galleryCategory.findUnique({
+            where: {
+                slug: categorySlug,
+                isActive: true
+            },
+            include: {
+                items: {
+                    where: { isActive: true },
+                    orderBy: { order: 'asc' }
+                }
+            }
+        })
+
+        if (!category) {
+            return { success: false, error: "Kategori tidak ditemukan" }
+        }
+
+        return { success: true, data: category }
+    } catch (error) {
+        console.error("Error fetching gallery items:", error)
+        return { success: false, error: "Gagal mengambil item galeri" }
+    }
+}
+
+export async function getActiveGalleryCategories() {
+    try {
+        const categories = await prisma.galleryCategory.findMany({
+            where: { isActive: true },
+            orderBy: { order: 'asc' },
+            include: {
+                items: {
+                    where: { isActive: true },
+                    orderBy: { order: 'asc' },
+                    take: 1
+                },
+                _count: {
+                    select: {
+                        items: {
+                            where: { isActive: true }
+                        }
+                    }
+                }
+            }
+        })
+
+        return { success: true, data: categories }
+    } catch (error) {
+        console.error("Error fetching gallery categories:", error)
+        return { success: false, error: "Gagal mengambil kategori galeri" }
+    }
+}
+
+export async function getFeaturedGalleryItems(limit: number = 8) {
+    try {
+        const items = await prisma.galleryItem.findMany({
+            where: {
+                isActive: true,
+                type: 'IMAGE' // Fokus ke gambar untuk carousel
+            },
+            orderBy: { createdAt: 'desc' },
+            take: limit,
+            include: {
+                category: {
+                    select: {
+                        title: true,
+                        slug: true
+                    }
+                }
+            }
+        })
+
+        return { success: true, data: items }
+    } catch (error) {
+        console.error("Error fetching featured gallery items:", error)
+        return { success: false, error: "Gagal mengambil item galeri unggulan" }
     }
 }
