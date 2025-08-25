@@ -18,6 +18,35 @@ const scheduleSchema = z.object({
     recurringType: z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']).optional().nullable(),
 })
 
+export async function getUpcomingSchedules(limit: number = 5) {
+    try {
+        const now = new Date();
+        const schedules = await prisma.scheduleEvent.findMany({
+            where: {
+                isActive: true,
+                OR: [
+                    {
+                        startDate: {
+                            gte: now
+                        },
+                        isRecurring: false
+                    },
+                    {
+                        isRecurring: true
+                    }
+                ]
+            },
+            orderBy: { startDate: 'asc' },
+            take: limit
+        });
+
+        return { success: true, data: schedules };
+    } catch (error) {
+        console.error("Error fetching schedules:", error);
+        return { success: false, error: "Gagal mengambil jadwal" };
+    }
+}
+
 export async function getScheduleEvents(): Promise<ScheduleEvent[]> {
     try {
         const events = await prisma.scheduleEvent.findMany({

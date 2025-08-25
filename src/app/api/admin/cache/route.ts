@@ -6,6 +6,11 @@ import {
     clearCachePathAction,
     clearAllCacheAction,
     clearCacheByTypeAction,
+    clearCacheByTagAction,
+    clearCacheByDependencyAction,
+    smartClearCacheAction,
+    autoClearCacheAction,
+    bulkClearCacheAction,
 } from '@/lib/cache/cache-manager'
 import { getCacheStats, updateLastCleared } from '@/lib/cache/cache-utils'
 
@@ -18,7 +23,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { action, target, type } = await request.json()
+        const { action, target, type, tag, paths, contentType, pathId } = await request.json()
 
         let result
         switch (action) {
@@ -34,6 +39,41 @@ export async function POST(request: NextRequest) {
                     return NextResponse.json({ error: 'Type is required' }, { status: 400 })
                 }
                 result = await clearCacheByTypeAction(type)
+                break
+
+            case 'clear-tag':
+                if (!tag) {
+                    return NextResponse.json({ error: 'Tag is required' }, { status: 400 })
+                }
+                result = await clearCacheByTagAction(tag)
+                break
+
+            case 'clear-dependency':
+                if (!target) {
+                    return NextResponse.json({ error: 'Dependency ID is required' }, { status: 400 })
+                }
+                result = await clearCacheByDependencyAction(target)
+                break
+
+            case 'smart-clear':
+                if (!pathId) {
+                    return NextResponse.json({ error: 'Path ID is required' }, { status: 400 })
+                }
+                result = await smartClearCacheAction(pathId)
+                break
+
+            case 'auto-clear':
+                if (!contentType) {
+                    return NextResponse.json({ error: 'Content type is required' }, { status: 400 })
+                }
+                result = await autoClearCacheAction(contentType)
+                break
+
+            case 'bulk-clear':
+                if (!paths || !Array.isArray(paths)) {
+                    return NextResponse.json({ error: 'Paths array is required' }, { status: 400 })
+                }
+                result = await bulkClearCacheAction(paths)
                 break
 
             case 'clear-all':

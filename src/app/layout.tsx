@@ -1,11 +1,11 @@
 import { Poppins } from 'next/font/google'
 import '@/app/admin/admin.css'
 import { ThemeProvider } from "@/components/theme-provider"
-import { ScrollAreaProvider } from '@/context/scrollarea-context'
 import { Toaster } from '@/components/ui/sonner'
 import ErrorBoundary from '@/components/molecules/error-boundary'
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['500', '800'] })
+
 
 export default async function AdminLayout({
     children,
@@ -14,7 +14,7 @@ export default async function AdminLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className={`${poppins.className} antialiased`}>
+            <body className={`${poppins.className} antialiased overflow-hidden w-full h-full`}>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="system"
@@ -22,11 +22,9 @@ export default async function AdminLayout({
                     disableTransitionOnChange
                 >
                     <Toaster position="top-center" />
-                    <ScrollAreaProvider>
                         <ErrorBoundary>
                             {children}
                         </ErrorBoundary>
-                    </ScrollAreaProvider>
                 </ThemeProvider>
             </body>
         </html>
