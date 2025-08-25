@@ -34,107 +34,135 @@ export interface CacheItem {
     label: string
     description: string
     lastModified?: string
+    tags?: string[]
+    dependencies?: string[]
 }
 
 // Daftar path yang perlu di-revalidate
 export const CACHE_PATHS: CacheItem[] = [
-    // Halaman utama
+    // Halaman utama/Beranda
     {
         id: 'home',
         type: 'page',
         path: '/',
-        label: 'Homepage',
-        description: 'Halaman utama website'
+        label: 'Beranda',
+        description: 'Halaman utama website',
+        tags: ['homepage', 'public', 'beranda'],
+        dependencies: ['api-articles', 'api-gallery', 'api-schedule']
     },
 
-    // Halaman konten berdasarkan schema Anda
+    // Halaman Artikel
     {
         id: 'articles',
         type: 'page',
-        path: '/articles',
+        path: '/artikel',
         label: 'Artikel',
-        description: 'Halaman daftar artikel'
+        description: 'Halaman daftar artikel',
+        tags: ['articles', 'content', 'artikel'],
+        dependencies: ['api-articles']
     },
     {
         id: 'articles-slug',
         type: 'page',
-        path: '/articles/[slug]',
+        path: '/artikel/[slug]',
         label: 'Detail Artikel',
-        description: 'Halaman detail artikel'
+        description: 'Halaman detail artikel',
+        tags: ['articles', 'detail', 'content', 'artikel'],
+        dependencies: ['api-articles']
     },
 
-    // Gallery
+    // Halaman Galeri
     {
         id: 'gallery',
         type: 'page',
-        path: '/gallery',
-        label: 'Gallery',
-        description: 'Halaman gallery foto/video'
+        path: '/galeri',
+        label: 'Galeri',
+        description: 'Halaman galeri foto/video',
+        tags: ['gallery', 'media', 'galeri'],
+        dependencies: ['api-gallery']
     },
     {
         id: 'gallery-category',
         type: 'page',
-        path: '/gallery/[category]',
-        label: 'Gallery Kategori',
-        description: 'Halaman gallery per kategori'
+        path: '/galeri/[category]',
+        label: 'Galeri Kategori',
+        description: 'Halaman galeri per kategori',
+        tags: ['gallery', 'category', 'media', 'galeri'],
+        dependencies: ['api-gallery']
     },
 
-    // Schedule/Calendar
+    // Halaman Tentang Kami
+    {
+        id: 'about',
+        type: 'page',
+        path: '/tentang-kami',
+        label: 'Tentang Kami',
+        description: 'Halaman tentang sanggar tari',
+        tags: ['about', 'company', 'tentang']
+    },
+
+    // Halaman Kontak Kami
+    {
+        id: 'contact',
+        type: 'page',
+        path: '/kontak-kami',
+        label: 'Kontak Kami',
+        description: 'Halaman kontak dan formulir',
+        tags: ['contact', 'form', 'kontak']
+    },
+
+    // Schedule/Calendar (jika ada)
     {
         id: 'schedule',
         type: 'page',
-        path: '/schedule',
+        path: '/jadwal',
         label: 'Jadwal Kegiatan',
-        description: 'Halaman kalendar kegiatan'
+        description: 'Halaman kalendar kegiatan',
+        tags: ['schedule', 'events', 'jadwal'],
+        dependencies: ['api-schedule']
     },
 
-    // FAQ
+    // FAQ (jika ada)
     {
         id: 'faq',
         type: 'page',
         path: '/faq',
         label: 'FAQ',
-        description: 'Halaman frequently asked questions'
-    },
-
-    // Contact
-    {
-        id: 'contact',
-        type: 'page',
-        path: '/contact',
-        label: 'Kontak',
-        description: 'Halaman kontak dan formulir'
-    },
-
-    // About pages
-    {
-        id: 'about',
-        type: 'page',
-        path: '/about',
-        label: 'Tentang Kami',
-        description: 'Halaman tentang organisasi'
+        description: 'Halaman frequently asked questions',
+        tags: ['faq', 'help']
     },
 
     // API Routes yang mungkin di-cache
     {
         id: 'api-articles',
         type: 'api',
-        path: '/api/articles',
+        path: '/api/artikel',
         label: 'API Artikel',
-        description: 'API endpoint untuk artikel'
+        description: 'API endpoint untuk artikel',
+        tags: ['api', 'articles', 'content', 'artikel']
     },
     {
         id: 'api-gallery',
         type: 'api',
-        path: '/api/gallery',
-        label: 'API Gallery',
-        description: 'API endpoint untuk gallery'
+        path: '/api/galeri',
+        label: 'API Galeri',
+        description: 'API endpoint untuk galeri',
+        tags: ['api', 'gallery', 'media', 'galeri']
     },
     {
         id: 'api-schedule',
         type: 'api',
-        path: '/api/schedule',
-        label: 'API Schedule',
-        description: 'API endpoint untuk jadwal'
+        path: '/api/jadwal',
+        label: 'API Jadwal',
+        description: 'API endpoint untuk jadwal',
+        tags: ['api', 'schedule', 'events', 'jadwal']
+    },
+    {
+        id: 'api-contact',
+        type: 'api',
+        path: '/api/kontak',
+        label: 'API Kontak',
+        description: 'API endpoint untuk kontak',
+        tags: ['api', 'contact', 'kontak']
     }
 ]
