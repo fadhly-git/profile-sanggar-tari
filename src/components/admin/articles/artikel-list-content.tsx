@@ -1,4 +1,3 @@
-// src/app/admin/artikel/artikel-list-content.tsx
 "use client"
 
 import { useState } from 'react'
@@ -16,9 +15,10 @@ import { useIsMobile } from '@/hooks/use-mobile'
 
 interface ArtikelListContentProps {
     articles: Article[]
+    onDeleteArticle: (id: string) => Promise<{ success: boolean; error?: string }>
 }
 
-export function ArtikelListContent({ articles: initialArticles }: ArtikelListContentProps) {
+export function ArtikelListContent({ articles: initialArticles, onDeleteArticle }: ArtikelListContentProps) {
     const router = useRouter()
     const isMobile = useIsMobile()
     const [articles, setArticles] = useState(initialArticles)
@@ -103,6 +103,7 @@ export function ArtikelListContent({ articles: initialArticles }: ArtikelListCon
                     open={showDeleteModal}
                     onOpenChange={setShowDeleteModal}
                     onSuccess={handleDeleteSuccess}
+                    onDelete={onDeleteArticle}
                 />
             </div>
         )
@@ -110,7 +111,6 @@ export function ArtikelListContent({ articles: initialArticles }: ArtikelListCon
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rowWrapper = (row: any, children: React.ReactNode) => {
-
         return (
             <ContextMenu key={row.id}>
                 <ContextMenuTrigger asChild>
@@ -174,6 +174,7 @@ export function ArtikelListContent({ articles: initialArticles }: ArtikelListCon
                 open={showDeleteModal}
                 onOpenChange={setShowDeleteModal}
                 onSuccess={handleDeleteSuccess}
+                onDelete={onDeleteArticle}
             />
         </div>
     )

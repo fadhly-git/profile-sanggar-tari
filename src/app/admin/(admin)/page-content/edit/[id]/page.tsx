@@ -10,6 +10,7 @@ export default async function EditPageContentPage({ params }: EditPageContentPag
     const resolvedParams = await params
     const { id } = resolvedParams
     const result = await getPageContentById(id)
+    console.log('Fetch Result:', result)
 
     if (!result.success || !result.data) {
         notFound()
