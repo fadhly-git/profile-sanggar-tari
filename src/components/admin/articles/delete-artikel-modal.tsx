@@ -1,4 +1,6 @@
-// src/components/admin/artikel/delete-artikel-modal.tsx
+"use client"
+
+import { useState } from "react"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -9,8 +11,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { useState } from "react"
-import { prisma } from "@/lib/prisma"
 
 interface DeleteArtikelModalProps {
     articleId: string | null
@@ -18,6 +18,7 @@ interface DeleteArtikelModalProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     onSuccess: () => void
+    onDelete: (id: string) => Promise<{ success: boolean; error?: string }>
 }
 
 export function DeleteArtikelModal({
@@ -25,22 +26,30 @@ export function DeleteArtikelModal({
     articleTitle,
     open,
     onOpenChange,
-    onSuccess
+    onSuccess,
+    onDelete
 }: DeleteArtikelModalProps) {
     const [isDeleting, setIsDeleting] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     const handleDelete = async () => {
         if (!articleId) return
 
         setIsDeleting(true)
+        setError(null)
+
         try {
-            await prisma.article.delete({
-                where: { id: articleId }
-            })
-            onSuccess()
-            onOpenChange(false)
+            const result = await onDelete(articleId)
+
+            if (result.success) {
+                onSuccess()
+                onOpenChange(false)
+            } else {
+                setError(result.error || 'Gagal menghapus artikel')
+            }
         } catch (error) {
             console.error('Error deleting article:', error)
+            setError('Terjadi kesalahan saat menghapus artikel')
         } finally {
             setIsDeleting(false)
         }
@@ -54,6 +63,11 @@ export function DeleteArtikelModal({
                     <AlertDialogDescription>
                         Apakah Anda yakin ingin menghapus artikel &quot;{articleTitle}&quot;?
                         Tindakan ini tidak dapat dibatalkan.
+                        {error && (
+                            <div className="mt-2 text-red-600 text-sm">
+                                {error}
+                            </div>
+                        )}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

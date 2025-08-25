@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/atoms/input"
-import { Textarea } from "@/components/atoms/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { RichTextEditor } from "@/components/editor/TiptapEditor"
@@ -13,7 +12,7 @@ import { createPageContent, updatePageContent } from "@/lib/page-content/actions
 import { PageContent } from "@/types/page-content"
 import { toast } from "sonner"
 import { ArrowLeft, Eye, Save } from "lucide-react"
-
+import { MetadataForm } from '@/components/molecules/metadata-form'
 interface PageContentFormProps {
     initialData?: PageContent
     mode: 'create' | 'edit'
@@ -170,13 +169,9 @@ export function PageContentForm({ initialData, mode }: PageContentFormProps) {
                                 </p>
                             </CardHeader>
                             <CardContent>
-                                <Textarea
-                                    label="Metadata"
+                                <MetadataForm
                                     value={formData.metadata}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, metadata: e.target.value }))}
-                                    placeholder='{"alamat": "...", "telepon": "...", "email": "..."}'
-                                    rows={4}
-                                    helperText="Format JSON untuk data tambahan"
+                                    onChange={(value) => setFormData(prev => ({ ...prev, metadata: value }))}
                                 />
                             </CardContent>
                         </Card>

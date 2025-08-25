@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
     AlertDialog,
@@ -25,7 +26,8 @@ import {
     Trash2,
     CheckCircle,
     AlertCircle,
-    XCircle
+    XCircle,
+    Loader2
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { CACHE_PATHS } from '@/lib/cache/cache-utils'
@@ -58,15 +60,33 @@ export default function CacheManager() {
         }
     }
 
-    const clearCache = async (action: string, target?: string, type?: string) => {
-        const loadingKey = target || type || 'all'
+    const clearCacheByTag = async (tag: string) => {
+        setLoading(tag)
+        await clearCache('clear-tag', undefined, undefined, tag)
+        setLoading(null)
+    }
+
+    const smartClear = async (pathId: string) => {
+        setLoading(pathId)
+        await clearCache('smart-clear', undefined, undefined, undefined, pathId)
+        setLoading(null)
+    }
+
+    const autoClear = async (contentType: 'article' | 'gallery' | 'schedule' | 'faq' | 'settings') => {
+        setLoading(contentType)
+        await clearCache('auto-clear', undefined, undefined, undefined, undefined, contentType)
+        setLoading(null)
+    }
+
+    const clearCache = async (action: string, target?: string, type?: string, tag?: string, pathId?: string, contentType?: string) => {
+        const loadingKey = target || type || tag || pathId || contentType || 'all'
         setLoading(loadingKey)
 
         try {
             const response = await fetch('/api/admin/cache', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action, target, type })
+                body: JSON.stringify({ action, target, type, tag, pathId, contentType })
             })
 
             const result = await response.json()
@@ -361,6 +381,55 @@ export default function CacheManager() {
                             )}
                         </TabsContent>
                     </Tabs>
+                </CardContent>
+            </Card>
+
+            {/* Advanced Cache Actions */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Advanced Cache Actions</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                        Clear cache berdasarkan tag atau content type
+                    </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label>Clear by Tag</Label>
+                            <div className="flex flex-wrap gap-2">
+                                {['artikel', 'galeri', 'jadwal', 'beranda', 'kontak', 'tentang'].map(tag => (
+                                    <Button
+                                        key={tag}
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => clearCacheByTag(tag)}
+                                        disabled={loading === tag}
+                                    >
+                                        {loading === tag ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+                                        {tag}
+                                    </Button>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <Label>Auto Clear by Content Type</Label>
+                            <div className="flex flex-wrap gap-2">
+                                {(['article', 'gallery', 'schedule', 'faq', 'settings'] as const).map(type => (
+                                    <Button
+                                        key={type}
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => autoClear(type)}
+                                        disabled={loading === type}
+                                    >
+                                        {loading === type ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+                                        {type}
+                                    </Button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
         </div>

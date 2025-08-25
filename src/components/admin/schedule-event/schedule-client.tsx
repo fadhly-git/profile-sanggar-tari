@@ -101,7 +101,6 @@ export function ScheduleClientPage({ currentUserId, data }: SchedulePageProps) {
             </ContextMenuContent>
         </ContextMenu>
     )
-    console.log(isFormOpen)
     return (
         <div className="container mx-auto px-4 py-8 space-y-6">
             {/* Header */}
