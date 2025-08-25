@@ -110,6 +110,7 @@ export default function UsersPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rowWrapper = (row: any, children: React.ReactNode) => (
         <UserRowWrapper
+            key={row.id}
             row={row}
             onView={handleView}
             onEdit={handleEdit}

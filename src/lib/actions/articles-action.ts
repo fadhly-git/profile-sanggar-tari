@@ -133,3 +133,61 @@ export async function getArticleById(id: string) {
         return null
     }
 }
+
+
+// public article
+export interface ArticleWithAuthor extends Article {
+  author: {
+    name: string;
+  };
+}
+
+export async function getPublishedArticles(limit?: number): Promise<ArticleWithAuthor[]> {
+  try {
+    const articles = await prisma.article.findMany({
+      where: {
+        status: ArticleStatus.PUBLISHED,
+        publishedAt: {
+          lte: new Date(),
+        },
+      },
+      include: {
+        author: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        publishedAt: 'desc',
+      },
+      take: limit,
+    });
+    return articles;
+  } catch (error) {
+    console.error("Error fetching published articles:", error);
+    return [];
+  }
+}
+
+export async function getArticleBySlug(slug: string): Promise<ArticleWithAuthor | null> {
+  try {
+    const article = await prisma.article.findUnique({
+      where: {
+        slug,
+        status: ArticleStatus.PUBLISHED,
+      },
+      include: {
+        author: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+    return article;
+  } catch (error) {
+    console.error(`Error fetching article by slug ${slug}:`, error);
+    return null;
+  }
+}

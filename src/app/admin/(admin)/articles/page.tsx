@@ -1,6 +1,6 @@
 // app/admin/articles/page.tsx
 import { Suspense } from "react"
-import { getArticles } from "@/lib/actions/articles-action"
+import { deleteArticle, getArticles } from "@/lib/actions/articles-action"
 import { ArtikelListContent } from "@/components/admin/articles/artikel-list-content"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -31,6 +31,11 @@ export default async function ArticlesPage() {
   )
 }
 
+async function handleDeleteArticle(id: string) {
+  'use server'
+  return await deleteArticle(id)
+}
+
 async function ArticlesData() {
   const articlesRaw = await getArticles()
   const articles = articlesRaw.map(article => ({
@@ -39,5 +44,5 @@ async function ArticlesData() {
     featuredImage: article.featuredImage === null ? undefined : article.featuredImage
   }))
 
-  return <ArtikelListContent articles={articles} />
+  return <ArtikelListContent articles={articles} onDeleteArticle={handleDeleteArticle} />
 }
