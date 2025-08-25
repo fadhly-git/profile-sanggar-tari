@@ -25,7 +25,7 @@ export function MetadataViewer({ metadata, className = '' }: MetadataViewerProps
                     <CardTitle className="text-sm">Metadata</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap break-words overflow-hidden text-ellipsis">
                         {metadata}
                     </p>
                 </CardContent>
@@ -76,7 +76,7 @@ export function MetadataViewer({ metadata, className = '' }: MetadataViewerProps
             </CardHeader>
             <CardContent className="space-y-3">
                 {Object.entries(parsedMetadata).map(([key, value]) => (
-                    <div key={key} className="flex flex-col space-y-1">
+                    <div key={key} className="flex flex-col space-y-1 whitespace-pre-wrap break-words">
                         <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                             {key.replace(/_/g, ' ')}
                         </label>
