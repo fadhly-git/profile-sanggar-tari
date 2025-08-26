@@ -201,3 +201,14 @@ model PageContent {
 
   @@map("page_contents")
 }
+
+// Model untuk Hero Section
+model HeroSection {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("hero_sections")
+}
