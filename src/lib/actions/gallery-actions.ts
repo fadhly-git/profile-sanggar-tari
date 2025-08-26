@@ -269,3 +269,54 @@ export async function getFeaturedGalleryItems(limit: number = 8) {
         return { success: false, error: "Gagal mengambil item galeri unggulan" }
     }
 }
+
+export async function getGalleryCategories() {
+  try {
+    const categories = await prisma.galleryCategory.findMany({
+      where: { isActive: true },
+      include: {
+        items: {
+          where: { isActive: true },
+          orderBy: { order: "asc" },
+          take: 1, // Ambil 1 item untuk thumbnail kategori
+        },
+        _count: {
+          select: {
+            items: {
+              where: { isActive: true }
+            }
+          }
+        }
+      },
+      orderBy: { order: "asc" },
+    });
+
+    return { success: true, data: categories };
+  } catch (error) {
+    console.error("Error fetching gallery categories:", error);
+    return { success: false, error: "Gagal mengambil kategori galeri" };
+  }
+}
+
+export async function getAllGalleryItems(limit?: number) {
+  try {
+    const items = await prisma.galleryItem.findMany({
+      where: { isActive: true },
+      include: {
+        category: {
+          select: {
+            title: true,
+            slug: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      ...(limit && { take: limit }),
+    });
+
+    return { success: true, data: items };
+  } catch (error) {
+    console.error("Error fetching gallery items:", error);
+    return { success: false, error: "Gagal mengambil item galeri" };
+  }
+}

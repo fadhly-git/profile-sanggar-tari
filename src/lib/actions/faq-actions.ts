@@ -118,3 +118,22 @@ export async function toggleFAQStatus(id: string) {
         return { success: false, error: 'Gagal mengubah status FAQ' }
     }
 }
+
+export async function getActiveFaqs() {
+  try {
+    const faqs = await prisma.fAQ.findMany({
+      where: { isActive: true },
+      orderBy: { order: "asc" },
+      select: {
+        id: true,
+        question: true,
+        answer: true,
+      },
+    });
+
+    return { success: true, data: faqs };
+  } catch (error) {
+    console.error("Error fetching FAQs:", error);
+    return { success: false, error: "Gagal mengambil data FAQ" };
+  }
+}
