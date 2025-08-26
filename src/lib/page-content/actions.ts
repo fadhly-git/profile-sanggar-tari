@@ -3,7 +3,6 @@
 import { PageContent } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
 import { z } from "zod"
 
 const pageContentSchema = z.object({
@@ -75,7 +74,7 @@ export async function createPageContent(formData: FormData) {
     })
 
     revalidatePath('/admin/page-content')
-    redirect('/admin/page-content')
+    return { success: true }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { success: false, error: error.issues[0].message }

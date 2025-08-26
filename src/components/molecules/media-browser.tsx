@@ -266,6 +266,7 @@ export function MediaBrowser({
                                                         alt={file.filename || file.url}
                                                         title={file.filename || file.url}
                                                         fill
+                                                        sizes='100%'
                                                         className="object-cover rounded"
                                                     />
                                                     {selectedFile === file.url && (
