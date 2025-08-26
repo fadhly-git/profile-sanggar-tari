@@ -63,7 +63,7 @@ export function GalleryMobileCard({ item, onView, onEdit, onDelete }: GalleryMob
                                         </Badge>
                                         {item.category && (
                                             <Badge variant="secondary" className="text-xs">
-                                                {item.category}
+                                                {item.category.toString()}
                                             </Badge>
                                         )}
                                     </div>
