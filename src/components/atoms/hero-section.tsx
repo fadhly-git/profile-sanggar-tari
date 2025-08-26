@@ -21,7 +21,7 @@ export default function HeroSection({
         <section className="relative min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
             {backgroundImage && (
                 <div
-                    className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30 h-full w"
                     style={{ backgroundImage: `url(${backgroundImage})` }}
                 />
             )}

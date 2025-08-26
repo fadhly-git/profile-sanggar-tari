@@ -163,7 +163,7 @@ export async function getPublishedArticles(limit?: number): Promise<ArticleWithA
       },
       take: limit,
     });
-    console.log('Fetched Articles:', articles);
+    // console.log('Fetched Articles:', articles);
     return articles;
   } catch (error) {
     console.error("Error fetching published articles:", error);

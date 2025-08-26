@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // @/app/(public)/page.tsx
 import { Suspense } from 'react'
 import { Metadata } from 'next'
@@ -16,13 +17,20 @@ import Image from 'next/image'
 
 export async function generateMetadata(): Promise<Metadata> {
   const settingsResult = await getAllSettings()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pageContentsResult = await getPageContentByKey('beranda')
   const settings: { site_name?: string; site_description?: string;[key: string]: any } = settingsResult.success && settingsResult.data ? settingsResult.data : {}
+  const pageContents: {
+    keywords?: string;
+    author?: string;
+    hero_image_1?: string;
+    hero_image_2?: string;
+    [key: string]: any
+  } = pageContentsResult && 'success' in pageContentsResult && pageContentsResult.success && 'data' in pageContentsResult && pageContentsResult.data ? pageContentsResult.data : {}
 
   return {
     title: settings.site_name || 'Sanggar Tari Ngesti Laras Budaya',
     description: settings.site_description || 'Sanggar tari tradisional dan modern untuk anak-anak',
-    keywords: 'sanggar tari, tari tradisional, tari modern, anak, budaya, yogyakarta',
+    keywords: 'sanggar tari, tari tradisional, tari modern, anak, budaya, Kendal, Jawa Tengah' + (pageContents.keywords ? `, ${pageContents.keywords}` : ''),
     openGraph: {
       title: settings.site_name || 'Sanggar Tari Ngesti Laras Budaya',
       description: settings.site_description || 'Sanggar tari tradisional dan modern untuk anak-anak',
@@ -34,13 +42,23 @@ export async function generateMetadata(): Promise<Metadata> {
 
 async function HeroContent() {
   const settingsResult = await getAllSettings()
+  const pageContentsResult = await getPageContentByKey('beranda');
   const settings = settingsResult.success ? (settingsResult.data as { hero_title?: string; hero_subtitle?: string; hero_cta_text?: string }) : {}
+  const pageContents: {
+    keywords?: string;
+    author?: string;
+    // eslint-disable-file @typescript-eslint/no-explicit-any
+    metadata?: Record<string, any>;
+    [key: string]: any
+  } = pageContentsResult?.success && pageContentsResult.data ? pageContentsResult.data : {}
 
+ console.log('Page Contents gh: ', pageContents);
   return (
     <HeroSection
       title={settings?.hero_title || 'Selamat Datang di Sanggar Tari Ngesti Laras Budaya'}
       subtitle={settings.hero_subtitle || 'Tempat belajar tari tradisional dan modern untuk anak'}
       ctaText={settings.hero_cta_text || 'Hubungi Kami'}
+      backgroundImage={pageContents.metadata?.hero_image_1 || pageContents.metadata?.hero_image_2 || pageContents.metadata?.hero_image_3 || undefined}
       ctaLink="/kontak"
     />
   )
@@ -138,7 +156,6 @@ async function ScheduleSection() {
 
 async function NewsSection() {
   const articlesResult = await getPublishedArticles(3)
-  console.log('Articles Fetch Result:', articlesResult)
   const articles = articlesResult || []
 
   if (articles.length === 0) return null
