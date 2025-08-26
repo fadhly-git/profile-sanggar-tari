@@ -1,6 +1,6 @@
 'use server'
 
-import { PrismaClient } from '@prisma/client'
+import { type HeroSection, PrismaClient } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 
 const prisma = new PrismaClient()
@@ -70,6 +70,24 @@ export async function getHeroSections() {
         console.error('Error fetching hero sections:', error)
         return []
     }
+}
+
+export async function getActiveHeroSections(): Promise<HeroSection[]> {
+  try {
+    const heroSections = await prisma.heroSection.findMany({
+      where: {
+        isActive: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+
+    return heroSections
+  } catch (error) {
+    console.error('Error fetching active hero sections:', error)
+    return []
+  }
 }
 
 export async function getHeroSectionById(id: string) {
