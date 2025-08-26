@@ -6,6 +6,7 @@ import {
   DatabaseBackup,
   FileText,
   HelpCircle,
+  ImageDown,
   Images,
   LayoutDashboard,
   MessageSquareWarning,
@@ -29,6 +30,7 @@ import {
 } from "@/components/ui/sidebar"
 import Image from "next/image"
 import Link from "next/link"
+import { title } from "process"
 
 const data = {
   navMain: [
@@ -86,6 +88,11 @@ const data = {
       icon: FileText,
     },
     {
+      title: "Hero Section",
+      url: "/admin/hero-sections",
+      icon: ImageDown,
+    },
+    {
       title: "Pengaturan Website",
       url: "/admin/settings",
       icon: Settings2,
@@ -96,6 +103,11 @@ const data = {
       title: "Cache",
       url: "/admin/cache",
       icon: DatabaseBackup,
+    },
+    {
+      title: "Media Library",
+      url: "/admin/media",
+      icon: ImageDown,
     },
     {
       title: "Feedback",
