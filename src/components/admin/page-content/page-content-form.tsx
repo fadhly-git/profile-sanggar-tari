@@ -171,7 +171,9 @@ export function PageContentForm({ initialData, mode }: PageContentFormProps) {
                             <CardContent>
                                 <MetadataForm
                                     value={formData.metadata}
-                                    onChange={(value) => setFormData(prev => ({ ...prev, metadata: value }))}
+                                    onChange={(value) => {
+                                        setTimeout(() => setFormData(prev => ({ ...prev, metadata: value })), 0);
+                                    }}
                                 />
                             </CardContent>
                         </Card>
