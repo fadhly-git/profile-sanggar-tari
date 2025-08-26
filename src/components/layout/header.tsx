@@ -1,14 +1,11 @@
 // @/components/layout/header.tsx
 
 'use client'
-
-import { Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { getAllSettingsObj } from '@/lib/actions/setting-actions'
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetDescription, SheetTrigger } from '@/components/ui/sheet'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
@@ -154,8 +151,8 @@ export function HeaderContentClient({
                                 <Menu className="h-5 w-5" />
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right" className="w-80">
-                            <div className="flex flex-col space-y-4 mt-6">
+                        <SheetContent side="right" className="w-80 mx-auto mt-2">
+                            <div className="flex flex-col space-y-4 mt-6 mx-2">
                                 {navigationItems.map((item) => (
                                     <MobileNavigationItem
                                         key={item.href}
@@ -172,6 +169,11 @@ export function HeaderContentClient({
                                     </Button>
                                 </div>
                             </div>
+                            <SheetDescription>
+                                <div className="mt-6 text-sm text-muted-foreground mx-2">
+                                    &copy; {new Date().getFullYear()} {settings?.site_name || siteName}. All rights reserved.
+                                </div>
+                            </SheetDescription>
                         </SheetContent>
                     </Sheet>
                 </div>
