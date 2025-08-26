@@ -192,3 +192,34 @@ export async function getArticleBySlug(slug: string): Promise<ArticleWithAuthor 
     return null;
   }
 }
+
+export async function getRecentArticles(excludeSlug?: string, limit: number = 3) {
+  try {
+    const articles = await prisma.article.findMany({
+      where: { 
+        status: ArticleStatus.PUBLISHED,
+        publishedAt: {
+          lte: new Date()
+        },
+        ...(excludeSlug && { slug: { not: excludeSlug } }),
+      },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        featuredImage: true,
+        publishedAt: true,
+      },
+      orderBy: {
+        publishedAt: "desc",
+      },
+      take: limit,
+    });
+
+    return { success: true, data: articles };
+  } catch (error) {
+    console.error("Error fetching recent articles:", error);
+    return { success: false, error: "Gagal mengambil artikel terbaru" };
+  }
+}
