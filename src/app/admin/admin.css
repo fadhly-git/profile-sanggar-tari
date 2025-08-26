@@ -120,3 +120,75 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.prose {
+  @apply leading-relaxed;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  @apply font-semibold text-primary/50 mt-8 mb-4;
+}
+
+.prose h1 { @apply text-2xl; }
+.prose h2 { @apply text-xl; }
+.prose h3 { @apply text-lg; }
+
+.prose p {
+  @apply mb-4;
+}
+
+/* Perbaikan untuk lists */
+.prose ul, .prose ol {
+  @apply mb-4 pl-6;
+}
+
+.prose ul {
+  list-style-type: disc; /* Tambahkan bullet points */
+}
+
+.prose ol {
+  list-style-type: decimal; /* Tambahkan numbering */
+}
+
+.prose ul ul {
+  list-style-type: circle; /* Nested bullets */
+}
+
+.prose ol ol {
+  list-style-type: lower-alpha; /* Nested numbering */
+}
+
+.prose li {
+  @apply mb-2;
+  display: list-item; /* Pastikan display sebagai list item */
+}
+
+/* Hilangkan margin pada paragraf dalam list item */
+.prose li p {
+  @apply mb-1;
+}
+
+.prose li p:last-child {
+  @apply mb-0;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-primary pl-4 italic bg-gray-50 py-2 my-4;
+}
+
+.prose img {
+  @apply rounded-lg mx-auto my-6;
+}
+
+.prose table {
+  @apply w-full border-collapse border border-gray-300 my-6;
+}
+
+.prose th, .prose td {
+  @apply border border-gray-300 px-4 py-2;
+}
+
+.prose th {
+  @apply bg-gray-50 font-semibold;
+}
