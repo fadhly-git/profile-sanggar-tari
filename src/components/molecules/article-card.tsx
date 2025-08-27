@@ -1,6 +1,5 @@
 // @/components/molecules/article-card.tsx
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { Calendar, User } from 'lucide-react'
 import { format } from 'date-fns'
