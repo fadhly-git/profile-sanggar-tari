@@ -84,9 +84,9 @@ const RecentArticles: React.FC<RecentArticlesProps> = ({ articles, loading = fal
         ) : (
           <div className="space-y-4">
             {articles.map((article) => (
-              <div key={article.id} className="flex items-center justify-between py-3 hover:bg-gray-50 rounded-lg px-3 -mx-3">
+              <div key={article.id} className="flex items-center justify-between py-3 hover:bg-background/90 rounded-lg px-3 -mx-3">
                 <div className="flex-1">
-                  <h4 className="text-sm font-medium text-gray-900 mb-1">{article.title}</h4>
+                  <h4 className="text-sm font-medium mb-1">{article.title}</h4>
                   <div className="flex items-center text-xs text-gray-500 space-x-4">
                     <span>By {article.author.name}</span>
                     <span>{formatDate(article.createdAt)}</span>

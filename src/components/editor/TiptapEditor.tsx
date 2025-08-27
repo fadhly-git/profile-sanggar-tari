@@ -649,7 +649,7 @@ export function RichTextEditor({ content, onChange, onImageDelete }: RichTextEdi
 
             {/* Editor Content */}
             <div className="bg-secondary">
-                <EditorContent editor={editor} />
+                <EditorContent editor={editor} className='prose prose-sm m-4' />
             </div>
         </div>
     )

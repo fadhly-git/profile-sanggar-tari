@@ -9,12 +9,11 @@ import { autoClearCacheAction, clearCacheByTagAction, smartClearCacheAction } fr
 export async function handleContentCacheInvalidation(
     action: 'create' | 'update' | 'delete',
     contentType: 'article' | 'gallery' | 'schedule' | 'faq' | 'settings',
-    contentId?: string
 ) {
     try {
         // Auto clear based on content type
         const result = await autoClearCacheAction(contentType)
-        
+
         console.log(`Cache auto-cleared for ${contentType} ${action}:`, result.message)
         return result
     } catch (error) {
@@ -34,19 +33,14 @@ export async function handleArticleCacheInvalidation(
     action: 'publish' | 'unpublish' | 'delete'
 ) {
     try {
-        const paths = [
-            '/',
-            '/artikel',
-            `/artikel/${articleSlug}`
-        ]
-        
+
         // Clear article-related tags
         await clearCacheByTagAction('articles')
         await clearCacheByTagAction('artikel')
         await clearCacheByTagAction('content')
         await clearCacheByTagAction('homepage')
         await clearCacheByTagAction('beranda')
-        
+
         return {
             success: true,
             message: `Article cache cleared for ${action} action`
@@ -69,16 +63,16 @@ export async function handleGalleryCacheInvalidation(
 ) {
     try {
         const tags = ['gallery', 'galeri', 'media', 'homepage', 'beranda']
-        
+
         for (const tag of tags) {
             await clearCacheByTagAction(tag)
         }
-        
+
         // If category specific, also clear category page
         if (categorySlug) {
             await smartClearCacheAction('gallery-category')
         }
-        
+
         return {
             success: true,
             message: `Gallery cache cleared for ${action} action`
@@ -104,7 +98,7 @@ export async function handleScheduleCacheInvalidation(
         await clearCacheByTagAction('events')
         await clearCacheByTagAction('homepage')
         await clearCacheByTagAction('beranda')
-        
+
         return {
             success: true,
             message: `Schedule cache cleared for ${action} action`
@@ -130,12 +124,12 @@ export async function handleSettingsCacheInvalidation(
         await clearCacheByTagAction('homepage')
         await clearCacheByTagAction('beranda')
         await clearCacheByTagAction('public')
-        
+
         // If it's a theme or layout setting, clear all pages
         if (settingKey.includes('theme') || settingKey.includes('layout') || settingKey.includes('logo')) {
             await autoClearCacheAction('settings')
         }
-        
+
         return {
             success: true,
             message: `Settings cache cleared for ${settingKey} ${action}`
@@ -158,7 +152,7 @@ export async function handleContactCacheInvalidation(
     try {
         await clearCacheByTagAction('contact')
         await clearCacheByTagAction('kontak')
-        
+
         return {
             success: true,
             message: `Contact cache cleared for ${action} action`
@@ -182,7 +176,7 @@ export async function handleAboutCacheInvalidation(
         await clearCacheByTagAction('about')
         await clearCacheByTagAction('tentang')
         await clearCacheByTagAction('company')
-        
+
         return {
             success: true,
             message: `About page cache cleared for ${action} action`
@@ -206,7 +200,7 @@ export async function handleHomepageCacheInvalidation(
         await clearCacheByTagAction('homepage')
         await clearCacheByTagAction('beranda')
         await clearCacheByTagAction('public')
-        
+
         return {
             success: true,
             message: `Homepage cache cleared due to ${reason}`

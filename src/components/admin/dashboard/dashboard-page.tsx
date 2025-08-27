@@ -135,12 +135,12 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ dashboardData }) => {
                             ) : (
                                 <div className="space-y-3">
                                     {dashboardData.recentMessages.slice(0, 3).map((message) => (
-                                        <div key={message.id} className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg">
+                                        <div key={message.id} className="flex items-start space-x-3 p-3 hover:bg-primary/90 rounded-lg">
                                             <div className={`w-3 h-3 rounded-full mt-2 ${!message.isRead ? 'bg-red-500' : ''}`}></div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-gray-900 truncate">{message.name}</p>
-                                                <p className="text-sm text-gray-600 truncate">{message.subject}</p>
-                                                <p className="text-xs text-gray-500">
+                                                <p className="text-sm font-medium truncate">{message.name}</p>
+                                                <p className="text-sm truncate">{message.subject}</p>
+                                                <p className="text-xs">
                                                     {new Date(message.createdAt).toLocaleDateString('id-ID')}
                                                 </p>
                                             </div>
@@ -152,7 +152,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ dashboardData }) => {
                     </Card>
 
                     {/* Quick Stats Card */}
-                    <Card className="bg-gradient-to-br from-blue-600 via-purple-600 to-purple-700 rounded-xl shadow-sm text-white">
+                    <Card className="bg-gradient-to-br from-blue-600 via-purple-600 to-purple-700 rounded-xl shadow-sm ">
                         <CardHeader className="flex flex-row items-center justify-between mb-0 pb-0">
                             <CardTitle className="text-lg font-semibold">Statistik Mingguan</CardTitle>
                             <div className="text-2xl">📊</div>

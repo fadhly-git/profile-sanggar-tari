@@ -1,8 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface DashboardStats {
   totalArticles: number;
   totalGalleryItems: number;
   totalEvents: number;
   totalMessages: number;
+  totalUnreadMessages: number;
+}
+
+export interface DashboardOverview {
+  stats: DashboardStats;
+  recentArticles: any[]; // Based on Prisma query result
+  todayEvents: any[]; // Based on Prisma query result
 }
 
 export interface ArticlesByStatus {

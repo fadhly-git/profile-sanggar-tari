@@ -8,7 +8,7 @@ interface PublicScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
     showScrollbar?: boolean;
     scrollbarOrientation?: "vertical" | "horizontal" | "both";
-    bottomSpacing?: "sm" | "md" | "lg" | "xl" | "2xl";
+    bottomSpacing?: "none" | "sm" | "md" | "lg" | "xl" | "2xl";
 }
 
 export const PublicScrollArea = forwardRef<HTMLDivElement, PublicScrollAreaProps>(
@@ -24,6 +24,7 @@ export const PublicScrollArea = forwardRef<HTMLDivElement, PublicScrollAreaProps
 
         // Bottom spacing variants
         const bottomSpacingClasses = {
+            none: "",
             sm: "pb-4 md:pb-6",
             md: "pb-6 md:pb-8",
             lg: "pb-8 md:pb-12",
@@ -49,7 +50,6 @@ export const PublicScrollArea = forwardRef<HTMLDivElement, PublicScrollAreaProps
                         {children}
                     </div>
                     {/* Extra bottom spacer untuk memastikan scroll sampai akhir */}
-                    <div className="h-4 md:h-6 lg:h-8" aria-hidden="true" />
                 </ScrollArea.Viewport>
 
                 {showScrollbar && (scrollbarOrientation === "vertical" || scrollbarOrientation === "both") && (

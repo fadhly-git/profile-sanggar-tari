@@ -180,6 +180,7 @@ export function ArtikelForm({ article, authorId, onSubmit }: ArtikelFormProps) {
                                     helperText="URL artikel (otomatis dibuat dari judul)"
                                     placeholder="url-artikel"
                                     required
+                                    disabled
                                 />
 
                                 <Textarea

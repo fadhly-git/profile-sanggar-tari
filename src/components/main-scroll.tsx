@@ -2,7 +2,7 @@
 import { useScrollAreaScroll } from "@/hooks/use-scroll-direction"
 import { cn } from "@/lib/utils";
 import * as ScrollArea from "@radix-ui/react-scroll-area"
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useState } from "react";
 
 interface MainScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
@@ -20,7 +20,13 @@ export const MainScrollArea = forwardRef<HTMLDivElement, MainScrollAreaProps>(
         bottomSpacing = "lg",
         ...props
     }, ref) => {
+        const [isMounted, setIsMounted] = useState(false);
         const { scrollAreaRef } = useScrollAreaScroll();
+
+        // Prevent hydration mismatch by ensuring client-side rendering
+        useEffect(() => {
+            setIsMounted(true);
+        }, []);
 
         // Bottom spacing variants
         const bottomSpacingClasses = {
@@ -30,6 +36,24 @@ export const MainScrollArea = forwardRef<HTMLDivElement, MainScrollAreaProps>(
             xl: "pb-12 md:pb-16",
             "2xl": "pb-16 md:pb-20"
         };
+
+        // Return basic div during SSR to prevent hydration mismatch
+        if (!isMounted) {
+            return (
+                <div
+                    ref={ref}
+                    className={cn(
+                        "h-screen w-full overflow-auto",
+                        "pt-4 px-4 md:pt-6 md:px-6 lg:pt-8 lg:px-8",
+                        bottomSpacingClasses[bottomSpacing],
+                        className
+                    )}
+                    {...props}
+                >
+                    {children}
+                </div>
+            );
+        }
 
         return (
             <ScrollArea.Root className="h-screen w-full overflow-hidden">
@@ -41,16 +65,14 @@ export const MainScrollArea = forwardRef<HTMLDivElement, MainScrollAreaProps>(
                         ref={ref}
                         className={cn(
                             "w-full min-h-full flex-grow",
-                            "pt-4 px-4 md:pt-6 md:px-6 lg:pt-8 lg:px-8", // Top and horizontal padding
-                            bottomSpacingClasses[bottomSpacing], // Dynamic bottom spacing
+                            "pt-4 px-4 md:pt-6 md:px-6 lg:pt-8 lg:px-8",
+                            bottomSpacingClasses[bottomSpacing],
                             className
                         )}
                         {...props}
                     >
                         {children}
                     </div>
-                    {/* Extra bottom spacer untuk memastikan scroll sampai akhir */}
-                    <div className="h-4 md:h-6 lg:h-8" aria-hidden="true" />
                 </ScrollArea.Viewport>
 
                 {showScrollbar && (scrollbarOrientation === "vertical" || scrollbarOrientation === "both") && (

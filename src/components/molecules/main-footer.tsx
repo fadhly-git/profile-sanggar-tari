@@ -4,36 +4,39 @@ import Link from 'next/link'
 import { getAllSettingsObj } from '@/lib/actions/setting-actions'
 import { getPageContentByKey } from '@/lib/actions/page-content-actions'
 import { Facebook, Instagram, Mail, MapPin, Phone } from 'lucide-react'
+import { TikTokIcon } from '../atoms/d'
 
 async function FooterContent() {
     const [settingsResult, contactResult] = await Promise.all([
         getAllSettingsObj(),
         getPageContentByKey('contact_info')
     ])
-    
+
     const settings = settingsResult.success ? settingsResult.data : {}
     const contactInfo = contactResult.success ? contactResult.data : null
-    
+
     const siteName = settings?.site_name || 'Sanggar Tari Ngesti Laras Budaya'
     const siteDescription = settings?.site_description || 'Sanggar tari tradisional dan modern untuk anak-anak'
-    
+
     // Parse contact metadata
     const contactData = contactInfo?.metadata || {}
-    
+
     return (
         <footer className="bg-muted/50 border-t">
             <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {/* Brand Info */}
                     <div className="space-y-4">
-                        <h3 className="font-bold text-lg">{siteName}</h3>
-                        <p className="text-sm text-muted-foreground">
+                        <Link href="/" className='cursor-pointer'>
+                            <h3 className="font-bold text-lg">{siteName}</h3>
+                        </Link>
+                        <p className="text-md text-muted-foreground">
                             {siteDescription}
                         </p>
                         <div className="flex space-x-4">
-                            {contactData.instagram && (
-                                <Link 
-                                    href={contactData.instagram}
+                            {contactData.socialMedia.instagram && (
+                                <Link
+                                    href={contactData.socialMedia.instagram}
                                     className="text-muted-foreground hover:text-primary"
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -41,21 +44,21 @@ async function FooterContent() {
                                     <Instagram className="h-5 w-5" />
                                 </Link>
                             )}
-                            {contactData.tiktok && (
-                                <Link 
-                                    href={contactData.tiktok}
+                            {contactData.socialMedia.tiktok && (
+                                <Link
+                                    href={contactData.socialMedia.tiktok}
                                     className="text-muted-foreground hover:text-primary"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-.88-.05A6.33 6.33 0 0 0 5.16 20.5a6.34 6.34 0 0 0 10.86-4.43V7.83a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.26z"/>
-                                    </svg>
+                                    <div className="h-5 w-5">
+                                        <TikTokIcon className='w-5 h-5' />
+                                    </div>
                                 </Link>
                             )}
-                            {contactData.facebook && (
-                                <Link 
-                                    href={contactData.facebook}
+                            {contactData.socialMedia.facebook && (
+                                <Link
+                                    href={contactData.socialMedia.facebook}
                                     className="text-muted-foreground hover:text-primary"
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -65,7 +68,7 @@ async function FooterContent() {
                             )}
                         </div>
                     </div>
-                    
+
                     {/* Quick Links */}
                     <div className="space-y-4">
                         <h4 className="font-semibold">Menu</h4>
@@ -77,7 +80,7 @@ async function FooterContent() {
                             <li><Link href="/kontak" className="text-muted-foreground hover:text-primary">Kontak Kami</Link></li>
                         </ul>
                     </div>
-                    
+
                     {/* Contact Info */}
                     <div className="space-y-4">
                         <h4 className="font-semibold">Kontak</h4>
@@ -102,7 +105,7 @@ async function FooterContent() {
                             )}
                         </div>
                     </div>
-                    
+
                     {/* Operating Hours */}
                     <div className="space-y-4">
                         <h4 className="font-semibold">Jam Operasional</h4>
@@ -118,9 +121,9 @@ async function FooterContent() {
                         </div>
                     </div>
                 </div>
-                
+
                 <div className="border-t mt-8 pt-6 text-center text-sm text-muted-foreground">
-                    <p>&copy; {new Date().getFullYear()} {siteName}. Semua hak dilindungi.</p>
+                    <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</p>
                 </div>
             </div>
         </footer>

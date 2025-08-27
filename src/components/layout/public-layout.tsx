@@ -10,9 +10,11 @@ interface PublicLayoutProps {
 export function PublicLayout({ children }: PublicLayoutProps) {
     return (
         <div className="min-h-screen flex flex-col overflow-hidden">
-            <Header />
-            <PublicScrollArea bottomSpacing="sm">
-                {children}
+            <PublicScrollArea bottomSpacing="none">
+                <Header />
+                <main className="flex-grow">
+                    {children}
+                </main>
                 <Footer />
             </PublicScrollArea>
         </div>

@@ -18,7 +18,7 @@ async function HeaderContent() {
 export function Header() {
     return (
         <Suspense fallback={
-            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
+            <header className="top-0 z-100 w-full border-b bg-background/95 backdrop-blur fixed">
                 <div className="container mx-auto px-4">
                     <div className="flex h-16 items-center justify-between">
                         <div className="h-8 w-32 bg-muted rounded animate-pulse" />

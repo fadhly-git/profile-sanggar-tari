@@ -14,6 +14,7 @@ import { getPageContentByKey } from '@/lib/actions/page-content-actions'
 import { getPublishedArticles } from '@/lib/actions/articles-action'
 import { getUpcomingSchedules } from '@/lib/actions/schedule-actions'
 import Image from 'next/image'
+import { getHeroSections } from '@/lib/actions/hero-section-actions'
 
 export async function generateMetadata(): Promise<Metadata> {
   const settingsResult = await getAllSettings()
@@ -42,23 +43,15 @@ export async function generateMetadata(): Promise<Metadata> {
 
 async function HeroContent() {
   const settingsResult = await getAllSettings()
-  const pageContentsResult = await getPageContentByKey('beranda');
+  const hero = await getHeroSections()
   const settings = settingsResult.success ? (settingsResult.data as { hero_title?: string; hero_subtitle?: string; hero_cta_text?: string }) : {}
-  const pageContents: {
-    keywords?: string;
-    author?: string;
-    // eslint-disable-file @typescript-eslint/no-explicit-any
-    metadata?: Record<string, any>;
-    [key: string]: any
-  } = pageContentsResult?.success && pageContentsResult.data ? pageContentsResult.data : {}
-
- console.log('Page Contents gh: ', pageContents);
+  
   return (
     <HeroSection
       title={settings?.hero_title || 'Selamat Datang di Sanggar Tari Ngesti Laras Budaya'}
       subtitle={settings.hero_subtitle || 'Tempat belajar tari tradisional dan modern untuk anak'}
       ctaText={settings.hero_cta_text || 'Hubungi Kami'}
-      backgroundImage={pageContents.metadata?.hero_image_1 || pageContents.metadata?.hero_image_2 || pageContents.metadata?.hero_image_3 || undefined}
+      backgroundImages={hero ? hero : []}
       ctaLink="/kontak"
     />
   )

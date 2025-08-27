@@ -66,12 +66,6 @@ export default function CacheManager() {
         setLoading(null)
     }
 
-    const smartClear = async (pathId: string) => {
-        setLoading(pathId)
-        await clearCache('smart-clear', undefined, undefined, undefined, pathId)
-        setLoading(null)
-    }
-
     const autoClear = async (contentType: 'article' | 'gallery' | 'schedule' | 'faq' | 'settings') => {
         setLoading(contentType)
         await clearCache('auto-clear', undefined, undefined, undefined, undefined, contentType)

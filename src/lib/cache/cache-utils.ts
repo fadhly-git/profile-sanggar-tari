@@ -105,7 +105,7 @@ export const CACHE_PATHS: CacheItem[] = [
     {
         id: 'contact',
         type: 'page',
-        path: '/kontak-kami',
+        path: '/kontak',
         label: 'Kontak Kami',
         description: 'Halaman kontak dan formulir',
         tags: ['contact', 'form', 'kontak']

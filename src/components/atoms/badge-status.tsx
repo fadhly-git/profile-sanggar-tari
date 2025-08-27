@@ -7,6 +7,7 @@ interface BadgeStatusProps {
     status: 'success' | 'warning' | 'danger' | 'info'
     children: React.ReactNode
     className?: string
+    onClick?: () => void
 }
 
 interface StatusBadgeProps {
@@ -22,11 +23,12 @@ const statusVariants = {
     info: 'bg-blue-100 text-blue-800 hover:bg-blue-100',
 }
 
-export function BadgeStatus({ status, children, className }: BadgeStatusProps) {
+export function BadgeStatus({ status, children, className, ...props}: BadgeStatusProps) {
     return (
         <Badge
             variant="secondary"
             className={cn(statusVariants[status], className)}
+            {...props}
         >
             {children}
         </Badge>

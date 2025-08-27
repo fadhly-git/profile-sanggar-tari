@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { DashboardStats, DashboardOverview } from '@/types/dashboard';
+import { DashboardStats, DashboardOverview  } from '@/types/dashboard';
 
 export class DashboardService {
     static async getDashboardStats(): Promise<DashboardStats> {
@@ -28,7 +28,7 @@ export class DashboardService {
 
             // Total pesan yang belum dibaca
             prisma.contactSubmission.count({
-                where: { isRead: false }
+                where: { repliedAt: null }
             })
         ]);
 

@@ -44,6 +44,20 @@ export function formatTime(date: Date | string): string {
   }).format(dateObj)
 }
 
+export function formatDateRelative(date: string | Date): string {
+  const now = new Date();
+  const dateObj = new Date(date);
+  const diffTime = Math.abs(now.getTime() - dateObj.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 1) return "Kemarin";
+  if (diffDays <= 7) return `${diffDays} hari lalu`;
+  if (diffDays <= 30) return `${Math.floor(diffDays / 7)} minggu lalu`;
+  if (diffDays <= 365) return `${Math.floor(diffDays / 30)} bulan lalu`;
+
+  return formatDate(date);
+}
+
 export function generateSlug(title: string): string {
   return title
     .toLowerCase()
@@ -86,4 +100,35 @@ export function createExcerpt(content: string, maxLength: number = 100): string 
   return lastSpaceIndex > 0
     ? truncated.substring(0, lastSpaceIndex) + '...'
     : truncated + '...';
+}
+
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trim() + "...";
+}
+
+export function estimateReadingTime(content: string | null | undefined): number {
+  // Handle null, undefined, atau empty content
+  if (!content || typeof content !== 'string') {
+    return 1; // Return minimal reading time
+  }
+
+  const wordsPerMinute = 200;
+
+  // Remove HTML tags and get clean text
+  const cleanContent = content
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/\s+/g, ' ')    // Normalize whitespace
+    .trim();
+
+  // Handle empty content after cleaning
+  if (!cleanContent) {
+    return 1;
+  }
+
+  const words = cleanContent.split(/\s+/).filter(word => word.length > 0).length;
+  const readingTime = Math.ceil(words / wordsPerMinute);
+
+  // Return minimum 1 minute
+  return Math.max(1, readingTime);
 }

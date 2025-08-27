@@ -4,8 +4,53 @@
 import { prisma } from "@/lib/prisma";
 import { ContactStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 import { sendThankYouEmail, sendAdminNotification } from "@/lib/actions/email-actions";
+
+interface RateLimitOptions {
+  interval: number; // dalam milidetik
+  maxRequests: number;
+}
+
+export async function rateLimit(
+  identifier: string,
+  options: RateLimitOptions = { interval: 15 * 60 * 1000, maxRequests: 3 } // 15 menit, max 3 request
+) {
+  const now = new Date();
+  const windowStart = new Date(now.getTime() - options.interval);
+
+  try {
+    // Hapus record lama
+    await prisma.$executeRaw`
+      DELETE FROM contact_submissions 
+      WHERE email = ${identifier} 
+      AND createdAt < ${windowStart}
+      AND status = 'PENDING'
+    `;
+
+    // Hitung request dalam window
+    const requestCount = await prisma.contactSubmission.count({
+      where: {
+        email: identifier,
+        createdAt: {
+          gte: windowStart,
+        },
+      },
+    });
+
+    if (requestCount >= options.maxRequests) {
+      return {
+        success: false,
+        error: `Terlalu banyak pesan. Coba lagi dalam ${Math.ceil(options.interval / 60000)} menit.`,
+        resetTime: new Date(now.getTime() + options.interval),
+      };
+    }
+
+    return { success: true, remaining: options.maxRequests - requestCount };
+  } catch (error) {
+    console.error("Rate limit error:", error);
+    return { success: true, remaining: options.maxRequests }; // Fallback jika error
+  }
+}
 
 export async function getContacts() {
   try {
@@ -87,6 +132,7 @@ export async function deleteContact(id: string) {
   }
 }
 
+// @/lib/actions/contact-actions.ts (update bagian createContact)
 export async function createContact(data: {
   name: string;
   email: string;
@@ -94,43 +140,68 @@ export async function createContact(data: {
   message: string;
 }) {
   try {
-    // Dapatkan IP address user
-    const headersList = await headers();
-    const userIp = headersList.get("x-forwarded-for") || 
-                   headersList.get("x-real-ip") || 
-                   "unknown";
+    // Rate limiting berdasarkan email
+    const rateLimitResult = await rateLimit(data.email.toLowerCase());
+    if (!rateLimitResult.success) {
+      return { success: false, error: rateLimitResult.error };
+    }
+
+    // Validasi data
+    if (!data.name.trim() || !data.email.trim() || !data.subject.trim() || !data.message.trim()) {
+      return { success: false, error: "Semua field wajib diisi" };
+    }
+
+    // Validasi email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+      return { success: false, error: "Format email tidak valid" };
+    }
 
     // Simpan ke database
     const contact = await prisma.contactSubmission.create({
-      data,
+      data: {
+        name: data.name.trim(),
+        email: data.email.toLowerCase().trim(),
+        subject: data.subject.trim(),
+        message: data.message.trim(),
+      },
     });
 
-    // Kirim email terima kasih ke customer
-    const thankYouResult = await sendThankYouEmail(
-      contact.email,
-      contact.name,
-      contact.subject,
-      contact.message,
-      userIp
-    );
+    // Kirim email (opsional)
+    try {
+      const thankYouResult = await sendThankYouEmail(
+        contact.email,
+        contact.name,
+        contact.subject,
+        contact.message
+      );
 
-    // Kirim notifikasi ke admin
-    const adminNotification = await sendAdminNotification(
-      contact.name,
-      contact.email,
-      contact.subject,
-      contact.message,
-      contact.id
-    );
+      const adminNotification = await sendAdminNotification(
+        contact.name,
+        contact.email,
+        contact.subject,
+        contact.message,
+        contact.id
+      );
+      if (!thankYouResult.success) {
+        console.error("Thank you email failed:", thankYouResult.error);
+      }
+      if (!adminNotification.success) {
+        console.error("Admin notification email failed:", adminNotification.error);
+      }
+    } catch (emailError) {
+      console.error("Email sending failed:", emailError);
+      // Tetap return success karena pesan sudah tersimpan
+    }
 
+    revalidatePath("/kontak");
     return { 
       success: true, 
       data: contact,
-      emailSent: thankYouResult.success,
-      adminNotified: adminNotification.success
+      message: "Pesan Anda telah terkirim. Terima kasih!"
     };
   } catch (error) {
     console.error("Error creating contact:", error);
-    return { success: false, error: "Failed to create contact" };
+    return { success: false, error: "Gagal mengirim pesan. Silakan coba lagi." };
   }
 }
