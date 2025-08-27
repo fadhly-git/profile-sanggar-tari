@@ -27,11 +27,11 @@ export const metadata: Metadata = {
 };
 
 interface ArticlePageProps {
-    searchParams: {
+    searchParams: Promise<{
         q?: string;
         sort?: string;
         page?: string;
-    };
+    }>;
 }
 
 const ARTICLES_PER_PAGE = 9;

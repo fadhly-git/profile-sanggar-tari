@@ -7,20 +7,22 @@ import { getServerSession } from 'next-auth'
 import { getActiveGalleryCategories } from '@/lib/actions/gallery-category-actions'
 
 interface EditGalleryPageProps {
-    params: {
+    params: Promise<{
         id: string
-    }
+    }>
 }
 
 export default async function EditGalleryPage({ params }: EditGalleryPageProps) {
     const session = await getServerSession(authOptions)
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
 
     if (!session?.user?.id) {
         return <div>Unauthorized</div>
     }
 
     const [item, categories] = await Promise.all([
-        getGalleryItemById(params.id),
+        getGalleryItemById(id),
         getActiveGalleryCategories()  // Fetch kategori aktif
     ])
     if (!item.success || !item.data) {

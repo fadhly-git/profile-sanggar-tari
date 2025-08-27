@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/select";
 
 interface ArticleSearchFilterProps {
+    onSearch?: (query: string) => void;
+    onSort?: (sortBy: string) => void;
     searchQuery: string;
     sortBy: string;
     totalResults: number;

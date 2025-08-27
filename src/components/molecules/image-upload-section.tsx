@@ -10,8 +10,8 @@ import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 
 // Import komponen ImageUpload yang sudah ada
-import { ImageUpload } from "@/components/ui/image-upload" // Sesuaikan path dengan lokasi komponen Anda
-import { isValidImageUrl } from "@/lib/validators"
+import { ImageUpload } from "@/components/molecules/image-upload" // Sesuaikan path dengan lokasi komponen Anda
+import { isValidImageUrl } from "@/lib/validator" 
 
 interface ImageUploadSectionProps {
   value: string

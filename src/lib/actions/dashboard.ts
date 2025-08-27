@@ -129,7 +129,8 @@ export async function getDashboardData(): Promise<ExtendedDashboardData> {
         totalArticles,
         totalGalleryItems,
         totalEvents,
-        totalMessages
+        totalMessages,
+        totalUnreadMessages: recentMessages.filter(msg => !msg.repliedAt).length
       },
       articlesByStatus: statusCounts,
       galleryByType: typeCounts,
@@ -156,7 +157,7 @@ export async function getDashboardData(): Promise<ExtendedDashboardData> {
         name: message.name,
         subject: message.subject,
         createdAt: message.createdAt.toISOString(),
-        isRead: message.isRead
+        isRead: message.repliedAt !== null
       })),
       thisWeekEvents
     };
