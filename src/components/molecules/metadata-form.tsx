@@ -18,14 +18,32 @@ interface MetadataFormProps {
 interface MetadataField {
     key: string
     value: string
-    type: 'text' | 'textarea' | 'url' | 'email'
-    parentKey?: string // untuk nested fields
-    id?: string // tambah unique id untuk stable key
+    type: 'text' | 'textarea' | 'url' | 'email' | 'image'
+    parentKey?: string
+    id?: string
+}
+
+type TemplateField = {
+    key: string;
+    value: string;
+    type: MetadataField['type'];
+    id: string;
 }
 
 interface CustomFieldGroup {
     groupName: string
     fields: MetadataField[]
+}
+
+interface ArrayItem {
+    id: string
+    fields: MetadataField[]
+}
+
+interface ArrayField {
+    arrayName: string
+    items: ArrayItem[]
+    template: MetadataField[] // template untuk item baru
 }
 
 const PREDEFINED_FIELDS: MetadataField[] = [
@@ -58,6 +76,31 @@ const PREDEFINED_GROUPS = [
     'gallery'
 ]
 
+const ARRAY_TEMPLATES: Record<string, TemplateField[]> = {
+    missions: [
+        { key: 'title', value: '', type: 'text', id: '' },
+        { key: 'description', value: '', type: 'textarea', id: '' },
+        { key: 'image', value: '', type: 'image', id: '' }
+    ],
+    services: [
+        { key: 'name', value: '', type: 'text', id: '' },
+        { key: 'description', value: '', type: 'textarea', id: '' },
+        { key: 'image', value: '', type: 'image', id: '' }
+    ],
+    team: [
+        { key: 'name', value: '', type: 'text', id: '' },
+        { key: 'position', value: '', type: 'text', id: '' },
+        { key: 'bio', value: '', type: 'textarea', id: '' },
+        { key: 'avatar', value: '', type: 'image', id: '' },
+        { key: 'email', value: '', type: 'email', id: '' },
+        { key: 'website', value: '', type: 'url', id: '' }
+    ],
+    testimonials: [
+        { key: 'name', value: '', type: 'text', id: '' },
+        { key: 'message', value: '', type: 'textarea', id: '' },
+        { key: 'photo', value: '', type: 'image', id: '' }
+    ]
+}
 // Helper function untuk generate unique ID
 const generateId = () => `field_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
@@ -65,7 +108,8 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
     const [fields, setFields] = useState<MetadataField[]>([])
     const [customFieldGroups, setCustomFieldGroups] = useState<CustomFieldGroup[]>([])
     const [flatCustomFields, setFlatCustomFields] = useState<MetadataField[]>([])
-    const [activeTab, setActiveTab] = useState<'seo' | 'contact' | 'custom'>('seo')
+    const [arrayFields, setArrayFields] = useState<ArrayField[]>([])
+    const [activeTab, setActiveTab] = useState<'seo' | 'contact' | 'custom' | 'arrays'>('seo')
     const [isInitialized, setIsInitialized] = useState(false)
 
     // Memoized predefined keys untuk mencegah re-creation
@@ -94,14 +138,50 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
                 id: generateId()
             }))
 
-            // Process nested objects and flat fields
+            // Process nested objects, arrays, and flat fields
             const groups: CustomFieldGroup[] = []
             const flatFields: MetadataField[] = []
+            const arrays: ArrayField[] = []
 
             Object.entries(parsed).forEach(([key, value]) => {
                 if (predefinedKeys.includes(key)) return
 
-                if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                if (Array.isArray(value)) {
+                    // This is an array field
+                    const items: ArrayItem[] = value.map((item: any) => {
+                        const itemFields: MetadataField[] = Object.entries(item).map(([itemKey, itemValue]) => ({
+                            key: itemKey,
+                            value: String(itemValue),
+                            type: itemKey === 'image' || itemKey === 'photo' || itemKey === 'avatar' ? 'image' as const :
+                                itemKey === 'description' || itemKey === 'bio' || itemKey === 'message' ? 'textarea' as const :
+                                    itemKey === 'email' ? 'email' as const :
+                                        itemKey === 'website' ? 'url' as const : 'text' as const,
+                            id: generateId()
+                        }))
+
+                        return {
+                            id: generateId(),
+                            fields: itemFields
+                        }
+                    })
+
+                    // Determine template from existing data or predefined templates
+                    let template = ARRAY_TEMPLATES[key as keyof typeof ARRAY_TEMPLATES]
+                    if (!template && items.length > 0) {
+                        template = items[0].fields.map(field => ({
+                            key: field.key,
+                            value: '',
+                            type: field.type,
+                            id: generateId()
+                        }))
+                    }
+
+                    arrays.push({
+                        arrayName: key,
+                        items,
+                        template: template || [{ key: 'title', value: '', type: 'text', id: generateId() }]
+                    })
+                } else if (typeof value === 'object' && value !== null) {
                     // This is a nested object
                     const groupFields: MetadataField[] = Object.entries(value as Record<string, any>).map(([subKey, subValue]) => ({
                         key: subKey,
@@ -129,18 +209,20 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
             setFields([...seoFields, ...contactFields])
             setCustomFieldGroups(groups)
             setFlatCustomFields(flatFields)
+            setArrayFields(arrays)
             setIsInitialized(true)
         } catch (error) {
             console.error('Error parsing metadata JSON:', error)
             setFields([...PREDEFINED_FIELDS.map(f => ({ ...f, id: generateId() })), ...CONTACT_FIELDS.map(f => ({ ...f, id: generateId() }))])
             setCustomFieldGroups([])
             setFlatCustomFields([])
+            setArrayFields([])
             setIsInitialized(true)
         }
     }, [value, isInitialized, predefinedKeys])
 
     // Function untuk generate JSON dari fields
-    const generateJSON = useCallback((currentFields: MetadataField[], currentGroups: CustomFieldGroup[], currentFlatFields: MetadataField[]) => {
+    const generateJSON = useCallback((currentFields: MetadataField[], currentGroups: CustomFieldGroup[], currentFlatFields: MetadataField[], currentArrays: ArrayField[]) => {
         const jsonObject: Record<string, any> = {}
 
         // Add regular fields
@@ -171,21 +253,131 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
             }
         })
 
+        // Add array fields
+        currentArrays.forEach(arrayField => {
+            const arrayItems = arrayField.items
+                .map(item => {
+                    const itemObject: Record<string, string> = {}
+                    item.fields.forEach(field => {
+                        if (field.key && field.value.trim()) {
+                            itemObject[field.key] = field.value
+                        }
+                    })
+                    return Object.keys(itemObject).length > 0 ? itemObject : null
+                })
+                .filter(item => item !== null)
+
+            if (arrayItems.length > 0) {
+                jsonObject[arrayField.arrayName] = arrayItems
+            }
+        })
+
         return Object.keys(jsonObject).length > 0 ? JSON.stringify(jsonObject, null, 2) : ''
     }, [])
 
-    // Update field functions
+    // Update field functions (existing ones)
     const updateField = useCallback((index: number, newValue: string) => {
         setFields(prev => {
             const newFields = [...prev]
             newFields[index] = { ...newFields[index], value: newValue }
 
-            const newJSON = generateJSON(newFields, customFieldGroups, flatCustomFields)
+            const newJSON = generateJSON(newFields, customFieldGroups, flatCustomFields, arrayFields)
             onChange(newJSON)
 
             return newFields
         })
-    }, [customFieldGroups, flatCustomFields, generateJSON, onChange])
+    }, [customFieldGroups, flatCustomFields, arrayFields, generateJSON, onChange])
+
+    // Array field functions
+    const addNewArray = useCallback((arrayName: string, template?: MetadataField[]) => {
+        const baseTemplate = template || ARRAY_TEMPLATES[arrayName as keyof typeof ARRAY_TEMPLATES]
+
+        // Convert template to MetadataField[] with proper typing
+        const newTemplate: MetadataField[] = baseTemplate
+            ? baseTemplate.map(field => ({
+                ...field,
+                id: generateId(),
+                // Ensure type compatibility
+                type: field.type as MetadataField['type']
+            }))
+            : [{ key: 'title', value: '', type: 'text' as const, id: generateId() }]
+
+        const newArray: ArrayField = {
+            arrayName,
+            items: [],
+            template: newTemplate
+        }
+
+        setArrayFields(prev => [...prev, newArray])
+    }, [])
+
+    const addItemToArray = useCallback((arrayIndex: number) => {
+        setArrayFields(prev => {
+            const newArrays = [...prev]
+            const template = newArrays[arrayIndex].template
+
+            const newItem: ArrayItem = {
+                id: generateId(),
+                fields: template.map(field => ({
+                    ...field,
+                    value: '',
+                    id: generateId()
+                }))
+            }
+
+            newArrays[arrayIndex] = {
+                ...newArrays[arrayIndex],
+                items: [...newArrays[arrayIndex].items, newItem]
+            }
+
+            const newJSON = generateJSON(fields, customFieldGroups, flatCustomFields, newArrays)
+            onChange(newJSON)
+
+            return newArrays
+        })
+    }, [fields, customFieldGroups, flatCustomFields, generateJSON, onChange])
+
+    const updateArrayItemField = useCallback((arrayIndex: number, itemIndex: number, fieldIndex: number, newValue: string) => {
+        setArrayFields(prev => {
+            const newArrays = [...prev]
+            const newItems = [...newArrays[arrayIndex].items]
+            const newFields = [...newItems[itemIndex].fields]
+
+            newFields[fieldIndex] = { ...newFields[fieldIndex], value: newValue }
+            newItems[itemIndex] = { ...newItems[itemIndex], fields: newFields }
+            newArrays[arrayIndex] = { ...newArrays[arrayIndex], items: newItems }
+
+            const newJSON = generateJSON(fields, customFieldGroups, flatCustomFields, newArrays)
+            onChange(newJSON)
+
+            return newArrays
+        })
+    }, [fields, customFieldGroups, flatCustomFields, generateJSON, onChange])
+
+    const removeArrayItem = useCallback((arrayIndex: number, itemIndex: number) => {
+        setArrayFields(prev => {
+            const newArrays = [...prev]
+            newArrays[arrayIndex] = {
+                ...newArrays[arrayIndex],
+                items: newArrays[arrayIndex].items.filter((_, i) => i !== itemIndex)
+            }
+
+            const newJSON = generateJSON(fields, customFieldGroups, flatCustomFields, newArrays)
+            onChange(newJSON)
+
+            return newArrays
+        })
+    }, [fields, customFieldGroups, flatCustomFields, generateJSON, onChange])
+
+    const removeArray = useCallback((arrayIndex: number) => {
+        setArrayFields(prev => {
+            const newArrays = prev.filter((_, i) => i !== arrayIndex)
+            const newJSON = generateJSON(fields, customFieldGroups, flatCustomFields, newArrays)
+            onChange(newJSON)
+            return newArrays
+        })
+    }, [fields, customFieldGroups, flatCustomFields, generateJSON, onChange])
+
 
     const updateGroupField = useCallback((groupIndex: number, fieldIndex: number, newValue: string) => {
         setCustomFieldGroups(prev => {
@@ -199,12 +391,12 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
                 value: newValue
             }
 
-            const newJSON = generateJSON(fields, newGroups, flatCustomFields)
+            const newJSON = generateJSON(fields, newGroups, flatCustomFields, arrayFields)
             onChange(newJSON)
 
             return newGroups
         })
-    }, [fields, flatCustomFields, generateJSON, onChange])
+    }, [fields, flatCustomFields, generateJSON, onChange, arrayFields])
 
     const updateGroupFieldKey = useCallback((groupIndex: number, fieldIndex: number, newKey: string) => {
         setCustomFieldGroups(prev => {
@@ -218,36 +410,36 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
                 key: newKey
             }
 
-            const newJSON = generateJSON(fields, newGroups, flatCustomFields)
+            const newJSON = generateJSON(fields, newGroups, flatCustomFields, arrayFields)
             onChange(newJSON)
 
             return newGroups
         })
-    }, [fields, flatCustomFields, generateJSON, onChange])
+    }, [fields, flatCustomFields, generateJSON, onChange, arrayFields])
 
     const updateFlatField = useCallback((index: number, newValue: string) => {
         setFlatCustomFields(prev => {
             const newFlatFields = [...prev]
             newFlatFields[index] = { ...newFlatFields[index], value: newValue }
 
-            const newJSON = generateJSON(fields, customFieldGroups, newFlatFields)
+            const newJSON = generateJSON(fields, customFieldGroups, newFlatFields, arrayFields)
             onChange(newJSON)
 
             return newFlatFields
         })
-    }, [fields, customFieldGroups, generateJSON, onChange])
+    }, [fields, customFieldGroups, generateJSON, onChange, arrayFields])
 
     const updateFlatFieldKey = useCallback((index: number, newKey: string) => {
         setFlatCustomFields(prev => {
             const newFlatFields = [...prev]
             newFlatFields[index] = { ...newFlatFields[index], key: newKey }
 
-            const newJSON = generateJSON(fields, customFieldGroups, newFlatFields)
+            const newJSON = generateJSON(fields, customFieldGroups, newFlatFields, arrayFields)
             onChange(newJSON)
 
             return newFlatFields
         })
-    }, [fields, customFieldGroups, generateJSON, onChange])
+    }, [fields, customFieldGroups, generateJSON, onChange, arrayFields])
 
     // Add new group
     const addNewGroup = useCallback((groupName: string) => {
@@ -282,12 +474,12 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
             // Remove group if no fields left
             const finalGroups = newGroups.filter(group => group.fields.length > 0)
 
-            const newJSON = generateJSON(fields, finalGroups, flatCustomFields)
+            const newJSON = generateJSON(fields, finalGroups, flatCustomFields, arrayFields)
             onChange(newJSON)
 
             return finalGroups
         })
-    }, [fields, flatCustomFields, generateJSON, onChange])
+    }, [fields, flatCustomFields, generateJSON, onChange, arrayFields])
 
     // Add flat custom field
     const addFlatCustomField = useCallback(() => {
@@ -298,14 +490,13 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
     const removeFlatCustomField = useCallback((index: number) => {
         setFlatCustomFields(prev => {
             const newFlatFields = prev.filter((_, i) => i !== index)
-            const newJSON = generateJSON(fields, customFieldGroups, newFlatFields)
+            const newJSON = generateJSON(fields, customFieldGroups, newFlatFields, arrayFields)
             onChange(newJSON)
             return newFlatFields
         })
-    }, [fields, customFieldGroups, generateJSON, onChange])
+    }, [fields, customFieldGroups, generateJSON, onChange, arrayFields])
 
     const renderField = (field: MetadataField, index: number, onValueChange: (value: string) => void, onKeyChange?: (key: string) => void, showRemove = false, onRemove?: () => void) => {
-        // Gunakan ID yang stabil untuk key, bukan field.key yang berubah
         const stableKey = field.id || `field-${index}`
         const fieldId = `${stableKey}-input`
 
@@ -336,7 +527,7 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
 
                 {!onKeyChange && (
                     <Label htmlFor={fieldId} className="text-sm font-medium">
-                        {field.key}
+                        {field.key} {field.type === 'image' && '(Image/Icon)'}
                     </Label>
                 )}
 
@@ -348,6 +539,19 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
                         placeholder={`Masukkan ${field.key}`}
                         rows={3}
                     />
+                ) : field.type === 'image' ? (
+                    <div className="space-y-2">
+                        <Input
+                            id={fieldId}
+                            type="text"
+                            value={field.value}
+                            onChange={(e) => onValueChange(e.target.value)}
+                            placeholder="URL gambar atau icon name (misal: square-kanban, 🏛️)"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Bisa berupa URL gambar, icon name (lucide), atau emoji
+                        </p>
+                    </div>
                 ) : (
                     <Input
                         id={fieldId}
@@ -402,7 +606,16 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
                     onClick={() => setActiveTab('custom')}
                     className="flex-1"
                 >
-                    Custom Fields
+                    Objects
+                </Button>
+                <Button
+                    type="button"
+                    variant={activeTab === 'arrays' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setActiveTab('arrays')}
+                    className="flex-1"
+                >
+                    Arrays
                 </Button>
             </div>
 
@@ -419,7 +632,7 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
                         </p>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {getSeoFields().map((field, index) => 
+                        {getSeoFields().map((field, index) =>
                             renderField(field, index, (value) => updateField(index, value))
                         )}
                     </CardContent>
@@ -436,11 +649,144 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
                         </p>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {getContactFields().map((field, index) => 
+                        {getContactFields().map((field, index) =>
                             renderField(field, index + PREDEFINED_FIELDS.length, (value) => updateField(index + PREDEFINED_FIELDS.length, value))
                         )}
                     </CardContent>
                 </Card>
+            )}
+
+            {/* Arrays Tab */}
+            {activeTab === 'arrays' && (
+                <div className="space-y-4">
+                    {/* Existing Arrays */}
+                    {arrayFields.map((arrayField, arrayIndex) => (
+                        <Card key={`array-${arrayField.arrayName + arrayIndex}`}>
+                            <CardHeader>
+                                <CardTitle className="flex items-center justify-between">
+                                    {arrayField.arrayName}
+                                    <div className="flex gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => addItemToArray(arrayIndex)}
+                                        >
+                                            <Plus className="h-4 w-4 mr-1" />
+                                            Add Item
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => removeArray(arrayIndex)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground">
+                                    Array untuk {arrayField.arrayName}. Total: {arrayField.items.length} items.
+                                </p>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {arrayField.items.map((item, itemIndex) => (
+                                    <Card key={item.id} className="bg-muted/50">
+                                        <CardHeader className="pb-0">
+                                            <CardTitle className="text-sm flex items-center justify-between">
+                                                Item {itemIndex + 1}
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => removeArrayItem(arrayIndex, itemIndex)}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-3">
+                                            {item.fields.map((field, fieldIndex) =>
+                                                renderField(
+                                                    field,
+                                                    fieldIndex,
+                                                    (value) => updateArrayItemField(arrayIndex, itemIndex, fieldIndex, value)
+                                                )
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                ))}
+
+                                {arrayField.items.length === 0 && (
+                                    <div className="text-center py-4 text-muted-foreground">
+                                        <p className="text-sm">Belum ada items. Klik &quot;Add Item&quot; untuk menambah.</p>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    ))}
+
+                    {/* Add New Array */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Tambah Array Baru</CardTitle>
+                            <p className="text-sm text-muted-foreground">
+                                Buat array baru untuk data yang berulang seperti missions, services, testimonials, dll.
+                            </p>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-3">
+                                <div>
+                                    <Label className='mb-2'>Pilih Template Array</Label>
+                                    <Select onValueChange={(value) => addNewArray(value)}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Pilih template yang sudah tersedia" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.keys(ARRAY_TEMPLATES).map(template => (
+                                                <SelectItem key={template} value={template}>
+                                                    {template} ({ARRAY_TEMPLATES[template as keyof typeof ARRAY_TEMPLATES].map(f => f.key).join(', ')})
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div>
+                                    <Label className='mb-2'>Atau Buat Array Custom</Label>
+                                    <Input
+                                        placeholder="Nama array (misal: features, team, portfolio)"
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter') {
+                                                const target = e.target as HTMLInputElement
+                                                if (target.value.trim()) {
+                                                    addNewArray(target.value.trim())
+                                                    target.value = ''
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {arrayFields.length === 0 && (
+                        <Card>
+                            <CardContent className="text-center py-8">
+                                <p className="text-muted-foreground mb-4">Belum ada array fields.</p>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => addNewArray('missions')}
+                                >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Mulai dengan Missions
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    )}
+                </div>
             )}
 
             {/* Custom Fields Tab */}
@@ -467,10 +813,10 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
                                 </p>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                {group.fields.map((field, fieldIndex) => 
+                                {group.fields.map((field, fieldIndex) =>
                                     renderField(
-                                        field, 
-                                        fieldIndex, 
+                                        field,
+                                        fieldIndex,
                                         (value) => updateGroupField(groupIndex, fieldIndex, value),
                                         (key) => updateGroupFieldKey(groupIndex, fieldIndex, key),
                                         true,
@@ -541,10 +887,10 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
                             </p>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {flatCustomFields.map((field, index) => 
+                            {flatCustomFields.map((field, index) =>
                                 renderField(
-                                    field, 
-                                    index, 
+                                    field,
+                                    index,
                                     (value) => updateFlatField(index, value),
                                     (key) => updateFlatFieldKey(index, key),
                                     true,
@@ -561,6 +907,7 @@ export function MetadataForm({ value, onChange }: MetadataFormProps) {
                     </Card>
                 </div>
             )}
+
 
             {/* JSON Preview */}
             <Card>

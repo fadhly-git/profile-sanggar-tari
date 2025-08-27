@@ -27,8 +27,10 @@ async function FooterContent() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {/* Brand Info */}
                     <div className="space-y-4">
-                        <h3 className="font-bold text-lg">{siteName}</h3>
-                        <p className="text-sm text-muted-foreground">
+                        <Link href="/" className='cursor-pointer'>
+                            <h3 className="font-bold text-lg">{siteName}</h3>
+                        </Link>
+                        <p className="text-md text-muted-foreground">
                             {siteDescription}
                         </p>
                         <div className="flex space-x-4">
@@ -121,7 +123,7 @@ async function FooterContent() {
                 </div>
 
                 <div className="border-t mt-8 pt-6 text-center text-sm text-muted-foreground">
-                    <p>&copy; {new Date().getFullYear()} {siteName}. Semua hak dilindungi.</p>
+                    <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</p>
                 </div>
             </div>
         </footer>

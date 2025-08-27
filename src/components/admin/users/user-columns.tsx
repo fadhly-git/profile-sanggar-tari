@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { ArrowUpDown, Eye, Edit, Trash, MoreHorizontal } from 'lucide-react'
 import { User } from '@prisma/client'
 import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 type UserData = Pick<User, 'id' | 'email' | 'name' | 'role' | 'createdAt' | 'updatedAt'>

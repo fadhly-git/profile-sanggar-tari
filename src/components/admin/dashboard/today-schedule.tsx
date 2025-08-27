@@ -2,10 +2,8 @@ import React from 'react';
 import { TodayEvent } from '@/types/dashboard';
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"

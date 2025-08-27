@@ -78,7 +78,7 @@ export function PageContentTable({ data }: PageContentTableProps) {
       accessorKey: "isActive",
       header: "Status",
       cell: ({ row }) => (
-        <BadgeStatus status={row.getValue("isActive") ? "success" : "info"}>
+        <BadgeStatus status={row.getValue("isActive") ? "success" : "info"} onClick={() => handleToggleStatus(row.original.id)}>
           {row.getValue("isActive") ? "Aktif" : "Nonaktif"}
         </BadgeStatus>
       ),

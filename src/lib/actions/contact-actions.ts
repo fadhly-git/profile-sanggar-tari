@@ -194,7 +194,7 @@ export async function createContact(data: {
       // Tetap return success karena pesan sudah tersimpan
     }
 
-    revalidatePath("/kontak-kami");
+    revalidatePath("/kontak");
     return { 
       success: true, 
       data: contact,

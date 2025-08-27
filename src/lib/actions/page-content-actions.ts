@@ -51,3 +51,39 @@ export async function getAllPageContents() {
         return { success: false, error: "Gagal mengambil konten halaman" }
     }
 }
+
+export async function getPageContentWithParsedMetadata(pageKey: string) {
+    try {
+        const pageContent = await prisma.pageContent.findUnique({
+            where: {
+                pageKey,
+                isActive: true
+            },
+        });
+
+        if (!pageContent) {
+            return { success: false, error: "Konten tidak ditemukan" };
+        }
+
+        // Parse metadata jika ada
+        let parsedMetadata = null;
+        if (pageContent.metadata) {
+            try {
+                parsedMetadata = JSON.parse(pageContent.metadata);
+            } catch (e) {
+                console.error(`Error parsing metadata for ${pageKey}:`, e);
+            }
+        }
+
+        return {
+            success: true,
+            data: {
+                ...pageContent,
+                parsedMetadata
+            }
+        };
+    } catch (error) {
+        console.error("Error fetching page content:", error);
+        return { success: false, error: "Gagal mengambil konten halaman" };
+    }
+}

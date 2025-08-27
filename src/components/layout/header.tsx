@@ -8,6 +8,7 @@ import { Menu } from 'lucide-react'
 import { Sheet, SheetContent, SheetDescription, SheetTrigger } from '@/components/ui/sheet'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
+import { ModeToggle } from '../mode-togle'
 
 const navigationItems = [
     { href: '/', label: 'Beranda' },
@@ -103,7 +104,7 @@ export function HeaderContentClient({
     const { isActive } = useActiveNavigation()
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <header className="sticky top-0 z-100 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto px-4">
                 <div className="flex h-16 items-center justify-between">
                     {/* Logo */}
@@ -142,6 +143,7 @@ export function HeaderContentClient({
                                 {settings?.hero_cta_text || 'Hubungi Kami'}
                             </Link>
                         </Button>
+                        <ModeToggle className='z-100' />
                     </div>
 
                     {/* Mobile Menu */}
