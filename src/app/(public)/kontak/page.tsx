@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// @/app/(public)/kontak-kami/page.tsx
+// @/app/(public)/kontak/page.tsx
 import { Metadata } from "next";
 import { getPageContentByKey } from "@/lib/actions/page-content-actions";
 import { getActiveFaqs } from "@/lib/actions/faq-actions";
@@ -10,11 +10,12 @@ import { Separator } from "@/components/ui/separator";
 import { TikTokIcon } from "@/components/atoms/d";
 import { MapEmbed } from "@/components/molecules/map-embed";
 import { FaqSection } from "@/components/molecules/faq-section";
+import Link from "next/link";
 
 export const metadata: Metadata = {
     title: "Kontak Kami - Sanggar Tari Ngesti Laras Budaya",
     description: "Hubungi kami untuk informasi lebih lanjut tentang kelas tari, jadwal, dan pendaftaran di Sanggar Tari Ngesti Laras Budaya.",
-    keywords: "kontak sanggar tari, hubungi kami, alamat sanggar tari, telepon sanggar tari",
+    keywords: "kontak sanggar tari ngesti laras budaya, hubungi kami, alamat sanggar tari ngesti laras budaya, telepon sanggar tari ngesti laras budaya, email sanggar tari, informasi sanggar tari",
 };
 
 async function ContactPage() {
@@ -25,8 +26,6 @@ async function ContactPage() {
     const contactInfo = contactInfoResult.success && contactInfoResult.data?.metadata
         ? contactInfoResult.data.metadata
         : null;
-
-    console.log("Contact Info:", contactInfo);
 
     // Default contact info jika tidak ada di database
     const defaultContactInfo = {
@@ -82,7 +81,7 @@ async function ContactPage() {
             {/* Header */}
             <div className="text-center mb-12">
                 <h1 className="text-4xl font-bold mb-4">Kontak Kami</h1>
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                <p className="text-base text-muted-foreground max-w-5xl mx-auto">
                     Ingin bergabung dengan kami atau memiliki pertanyaan? Jangan ragu untuk menghubungi kami!
                 </p>
             </div>
@@ -115,24 +114,24 @@ async function ContactPage() {
                                 <div className="space-y-2">
                                     <div>
                                         <h3 className="font-semibold mb-1">Telepon</h3>
-                                        <a
+                                        <Link
                                             href={`tel:${info.phone}`}
                                             className="text-muted-foreground hover:text-primary transition-colors"
                                         >
                                             {info.phone}
-                                        </a>
+                                        </Link>
                                     </div>
                                     {info.whatsapp && (
                                         <div>
                                             <h3 className="font-semibold mb-1">WhatsApp</h3>
-                                            <a
+                                            <Link
                                                 href={`https://wa.me/${info.whatsapp.replace(/[^\d]/g, '')}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-muted-foreground hover:text-primary transition-colors"
                                             >
                                                 {info.whatsapp}
-                                            </a>
+                                            </Link>
                                         </div>
                                     )}
                                 </div>
@@ -145,12 +144,12 @@ async function ContactPage() {
                                 <Mail className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                                 <div>
                                     <h3 className="font-semibold mb-1">Email</h3>
-                                    <a
+                                    <Link
                                         href={`mailto:${info.email}`}
                                         className="text-muted-foreground hover:text-primary transition-colors"
                                     >
                                         {info.email}
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
 
@@ -184,34 +183,34 @@ async function ContactPage() {
                             <CardContent>
                                 <div className="flex flex-wrap gap-4">
                                     {info.socialMedia.instagram && (
-                                        <a
+                                        <Link
                                             href={info.socialMedia.instagram}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
                                         >
                                             <span className="bg-gradient-to-r from-purple-500 to-pink-500 p-1 rounded-lg"><Instagram className="w-4 h-4 text-white" /></span> Instagram
-                                        </a>
+                                        </Link>
                                     )}
                                     {info.socialMedia.tiktok && (
-                                        <a
+                                        <Link
                                             href={info.socialMedia.tiktok}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
                                         >
                                             <span className="bg-black p-1 rounded-lg"><TikTokIcon className="w-4 h-4" /></span> TikTok
-                                        </a>
+                                        </Link>
                                     )}
                                     {info.socialMedia.facebook && (
-                                        <a
+                                        <Link
                                             href={info.socialMedia.facebook}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
                                         >
                                             <span className="bg-blue-600 p-1 rounded-lg text-white"><Facebook className="w-4 h-4" /></span> Facebook
-                                        </a>
+                                        </Link>
                                     )}
                                 </div>
                             </CardContent>

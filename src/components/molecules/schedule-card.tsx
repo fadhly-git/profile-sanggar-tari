@@ -1,7 +1,7 @@
 // @/components/molecules/schedule-card.tsx
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Calendar, Clock, MapPin, Repeat } from 'lucide-react'
-import { format, addWeeks, addMonths, addYears, isSameDay } from 'date-fns'
+import { format, addWeeks, addMonths, addYears } from 'date-fns'
 import { id } from 'date-fns/locale'
 import { Badge } from '@/components/ui/badge'
 import { RecurringType } from '@prisma/client'

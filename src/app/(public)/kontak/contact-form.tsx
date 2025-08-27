@@ -1,4 +1,4 @@
-// @/app/(public)/kontak-kami/contact-form.tsx
+// @/app/(public)/kontak/contact-form.tsx
 "use client";
 
 import { useState } from "react";
