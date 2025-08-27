@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start",
+    "start": "cross-env NODE_ENV=production node server.mjs",
     "lint": "next lint",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed"
@@ -58,6 +58,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "cross-env": "^10.0.0",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
     "jsonwebtoken": "^9.0.2",
