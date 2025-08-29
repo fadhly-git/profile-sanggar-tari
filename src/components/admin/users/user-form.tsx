@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/atoms/input'
+import { Input, PasswordInput } from '@/components/atoms/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { createUserSchema, updateUserSchema, type CreateUserInput, type UpdateUserInput } from '@/lib/validations/user-validation'
 import { createUser, updateUser } from '@/lib/actions/user-actions'
@@ -90,18 +90,16 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
                 {...register('name')}
             />
 
-            <Input
+            <PasswordInput
                 label={isEdit ? 'Password Baru (opsional)' : 'Password'}
-                type="password"
                 placeholder={isEdit ? 'Kosongkan jika tidak ingin mengubah' : 'Masukkan password'}
                 error={errors.password?.message}
                 helperText={isEdit ? 'Kosongkan jika tidak ingin mengubah password' : 'Minimal 8 karakter'}
                 {...register('password')}
             />
             
-            <Input
+            <PasswordInput
                 label={isEdit ? 'Konfirmasi Password Baru (opsional)' : 'Konfirmasi Password'}
-                type="password"
                 placeholder={isEdit ? 'Kosongkan jika tidak ingin mengubah' : 'Ulangi password'}
                 error={errors.confirmPassword?.message}
                 {...register('confirmPassword')}
