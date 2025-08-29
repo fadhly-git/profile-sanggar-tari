@@ -15,6 +15,7 @@ import { RecurringType } from '@prisma/client'
 import { toast } from 'sonner'
 import { DateTimePicker } from '@/components/molecules/datetime-picker'
 import { RecurringManager } from './recurring-manager'
+import { formatToLocalDateTime } from '@/lib/utils/timezone'
 
 interface ScheduleFormProps {
     event?: ScheduleEvent
@@ -39,12 +40,12 @@ export function ScheduleForm({ event, onSuccess, authorId }: ScheduleFormProps) 
         event ? {
             title: event.title,
             description: event.description || '',
-            startDate: new Date(event.startDate).toISOString().slice(0, 16),
-            endDate: event.endDate ? new Date(event.endDate).toISOString().slice(0, 16) : '',
+            startDate: formatToLocalDateTime(new Date(event.startDate)),
+            endDate: event.endDate ? formatToLocalDateTime(new Date(event.endDate)) : '',
             location: event.location || '',
             isRecurring: event.isRecurring,
             recurringType: event.recurringType,
-            recurringEndDate: event.recurringEndDate ? new Date(event.recurringEndDate).toISOString().slice(0, 16) : '',
+            recurringEndDate: event.recurringEndDate ? formatToLocalDateTime(new Date(event.recurringEndDate)) : '',
             exceptions: event.exceptions || [],
         } : initialFormData
     )

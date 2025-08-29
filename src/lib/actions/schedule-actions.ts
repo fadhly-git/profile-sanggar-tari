@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { parseLocalDateTime } from '@/lib/utils/timezone'
 import type { ScheduleEvent } from '@/types/schedule'
 import { RecurringType, Prisma } from '@prisma/client'
 
@@ -147,11 +148,22 @@ export async function getScheduleEventById(id: string): Promise<ScheduleEvent | 
 
 export async function createScheduleEvent(data: z.infer<typeof scheduleSchema> & { authorId: string }) {
     try {
+        // Parse datetime dengan timezone yang benar
+        const parsedStartDate = typeof data.startDate === 'string' 
+            ? parseLocalDateTime(data.startDate) 
+            : data.startDate
+        const parsedEndDate = data.endDate 
+            ? (typeof data.endDate === 'string' ? parseLocalDateTime(data.endDate) : data.endDate)
+            : null
+        const parsedRecurringEndDate = data.recurringEndDate 
+            ? (typeof data.recurringEndDate === 'string' ? parseLocalDateTime(data.recurringEndDate) : data.recurringEndDate)
+            : null
+
         const validatedData = scheduleSchema.parse({
             ...data,
-            startDate: new Date(data.startDate),
-            endDate: data.endDate ? new Date(data.endDate) : null,
-            recurringEndDate: data.recurringEndDate ? new Date(data.recurringEndDate) : null,
+            startDate: parsedStartDate,
+            endDate: parsedEndDate,
+            recurringEndDate: parsedRecurringEndDate,
         })
 
         const event = await prisma.scheduleEvent.create({
@@ -205,13 +217,25 @@ export async function updateScheduleEvent(
 
         if (data.title !== undefined) updateData.title = data.title
         if (data.description !== undefined) updateData.description = data.description || null
-        if (data.startDate !== undefined) updateData.startDate = new Date(data.startDate)
-        if (data.endDate !== undefined) updateData.endDate = data.endDate ? new Date(data.endDate) : null
+        if (data.startDate !== undefined) {
+            updateData.startDate = typeof data.startDate === 'string' 
+                ? parseLocalDateTime(data.startDate) 
+                : data.startDate
+        }
+        if (data.endDate !== undefined) {
+            updateData.endDate = data.endDate 
+                ? (typeof data.endDate === 'string' ? parseLocalDateTime(data.endDate) : data.endDate)
+                : null
+        }
         if (data.location !== undefined) updateData.location = data.location || null
         if (data.isActive !== undefined) updateData.isActive = data.isActive
         if (data.isRecurring !== undefined) updateData.isRecurring = data.isRecurring
         if (data.recurringType !== undefined) updateData.recurringType = data.recurringType as RecurringType | null
-        if (data.recurringEndDate !== undefined) updateData.recurringEndDate = data.recurringEndDate ? new Date(data.recurringEndDate) : null
+        if (data.recurringEndDate !== undefined) {
+            updateData.recurringEndDate = data.recurringEndDate 
+                ? (typeof data.recurringEndDate === 'string' ? parseLocalDateTime(data.recurringEndDate) : data.recurringEndDate)
+                : null
+        }
         if (data.exceptions !== undefined) updateData.exceptions = data.exceptions ? JSON.stringify(data.exceptions.map(date => date.toISOString())) : null
 
         const event = await prisma.scheduleEvent.update({

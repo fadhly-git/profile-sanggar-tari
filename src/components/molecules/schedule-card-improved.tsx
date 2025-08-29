@@ -5,6 +5,7 @@ import { format, addWeeks, addMonths, addYears, isAfter, isBefore, startOfDay, g
 import { id } from 'date-fns/locale'
 import { Badge } from '@/components/ui/badge'
 import { RecurringType } from '@prisma/client'
+import { formatIndonesiaTime } from '@/lib/utils/timezone'
 
 interface ScheduleCardProps {
     title: string
@@ -23,8 +24,8 @@ const getRecurringText = (startDate: Date, type: RecurringType, endDate?: Date) 
     const dayOfWeek = format(startDate, 'EEEE', { locale: id })
     const dayOfMonth = format(startDate, 'd')
     const month = format(startDate, 'MMMM', { locale: id })
-    const startTime = format(startDate, 'HH:mm')
-    const endTime = endDate ? ` - ${format(endDate, 'HH:mm')}` : ''
+    const startTime = formatIndonesiaTime(startDate)
+    const endTime = endDate ? ` - ${formatIndonesiaTime(endDate)}` : ''
 
     switch (type) {
         case 'WEEKLY':
@@ -266,8 +267,8 @@ export default function ScheduleCardImproved({
                         <div className="flex items-center space-x-2 text-sm">
                             <Clock className="h-4 w-4 text-primary" />
                             <span>
-                                {format(startDate, 'HH:mm')}
-                                {endDate && ` - ${format(endDate, 'HH:mm')}`}
+                                {formatIndonesiaTime(startDate)}
+                                {endDate && ` - ${formatIndonesiaTime(endDate)}`}
                             </span>
                         </div>
                     )}
@@ -294,8 +295,8 @@ export default function ScheduleCardImproved({
                                             {format(occurrence.startDate, 'dd MMM yyyy, EEEE', { locale: id })}
                                         </span>
                                         <span className="text-muted-foreground">
-                                            {format(occurrence.startDate, 'HH:mm')}
-                                            {occurrence.endDate && ` - ${format(occurrence.endDate, 'HH:mm')}`}
+                                            {formatIndonesiaTime(occurrence.startDate)}
+                                            {occurrence.endDate && ` - ${formatIndonesiaTime(occurrence.endDate)}`}
                                         </span>
                                     </div>
                                     {occurrence.isException && (
