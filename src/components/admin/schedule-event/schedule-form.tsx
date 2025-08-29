@@ -14,6 +14,7 @@ import { ScheduleEvent, ScheduleFormData } from '@/types/schedule'
 import { RecurringType } from '@prisma/client'
 import { toast } from 'sonner'
 import { DateTimePicker } from '@/components/molecules/datetime-picker'
+import { RecurringManager } from './recurring-manager'
 
 interface ScheduleFormProps {
     event?: ScheduleEvent
@@ -29,6 +30,8 @@ const initialFormData: ScheduleFormData = {
     location: '',
     isRecurring: false,
     recurringType: null,
+    recurringEndDate: '',
+    exceptions: [],
 }
 
 export function ScheduleForm({ event, onSuccess, authorId }: ScheduleFormProps) {
@@ -41,6 +44,8 @@ export function ScheduleForm({ event, onSuccess, authorId }: ScheduleFormProps) 
             location: event.location || '',
             isRecurring: event.isRecurring,
             recurringType: event.recurringType,
+            recurringEndDate: event.recurringEndDate ? new Date(event.recurringEndDate).toISOString().slice(0, 16) : '',
+            exceptions: event.exceptions || [],
         } : initialFormData
     )
 
@@ -87,6 +92,8 @@ export function ScheduleForm({ event, onSuccess, authorId }: ScheduleFormProps) 
                 isActive: true,
                 isRecurring: formData.isRecurring,
                 recurringType: formData.isRecurring ? formData.recurringType : undefined,
+                recurringEndDate: formData.isRecurring && formData.recurringEndDate ? new Date(formData.recurringEndDate) : undefined,
+                exceptions: formData.isRecurring ? formData.exceptions : undefined,
                 authorId,
             }
 
@@ -114,12 +121,14 @@ export function ScheduleForm({ event, onSuccess, authorId }: ScheduleFormProps) 
         }
     }
 
-    const handleInputChange = (field: keyof ScheduleFormData, value: string | boolean | RecurringType) => {
+    const handleInputChange = (field: keyof ScheduleFormData, value: string | boolean | RecurringType | Date[]) => {
         setFormData(prev => {
             const newData = { ...prev, [field]: value }
             // Reset recurringType when isRecurring is set to false
             if (field === 'isRecurring' && !value) {
                 newData.recurringType = null
+                newData.recurringEndDate = ''
+                newData.exceptions = []
             }
             return newData
         })
@@ -216,24 +225,34 @@ export function ScheduleForm({ event, onSuccess, authorId }: ScheduleFormProps) 
                         </div>
 
                         {formData.isRecurring && (
-                            <div>
-                                <Label className='mb-2'>Tipe Pengulangan</Label>
-                                <Select
-                                    value={formData.recurringType || undefined}
-                                    onValueChange={(value) => handleInputChange('recurringType', value as RecurringType)}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Pilih tipe pengulangan" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="WEEKLY">Mingguan</SelectItem>
-                                        <SelectItem value="MONTHLY">Bulanan</SelectItem>
-                                        <SelectItem value="YEARLY">Tahunan</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                {errors.recurringType && (
-                                    <p className="text-sm text-red-500 mt-1">{errors.recurringType}</p>
-                                )}
+                            <div className="space-y-4">
+                                <div>
+                                    <Label className='mb-2'>Tipe Pengulangan</Label>
+                                    <Select
+                                        value={formData.recurringType || undefined}
+                                        onValueChange={(value) => handleInputChange('recurringType', value as RecurringType)}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Pilih tipe pengulangan" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="WEEKLY">Mingguan</SelectItem>
+                                            <SelectItem value="MONTHLY">Bulanan</SelectItem>
+                                            <SelectItem value="YEARLY">Tahunan</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.recurringType && (
+                                        <p className="text-sm text-red-500 mt-1">{errors.recurringType}</p>
+                                    )}
+                                </div>
+
+                                <RecurringManager
+                                    exceptions={formData.exceptions || []}
+                                    onExceptionsChange={(exceptions) => handleInputChange('exceptions', exceptions)}
+                                    recurringEndDate={formData.recurringEndDate ? new Date(formData.recurringEndDate) : null}
+                                    onRecurringEndDateChange={(endDate) => handleInputChange('recurringEndDate', endDate ? endDate.toISOString().slice(0, 16) : '')}
+                                    recurringType={formData.recurringType || undefined}
+                                />
                             </div>
                         )}
                     </div>

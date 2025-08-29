@@ -5,7 +5,7 @@ import { Metadata } from 'next'
 import HeroSection from '@/components/atoms/hero-section'
 import SectionHeader from '@/components/atoms/section-header'
 import ArticleCard from '@/components/molecules/article-card'
-import ScheduleCard from '@/components/molecules/schedule-card'
+import ScheduleCard from '@/components/molecules/schedule-card-improved'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
@@ -30,13 +30,47 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: settings.site_name || 'Sanggar Tari Ngesti Laras Budaya',
-    description: settings.site_description || 'Sanggar tari tradisional dan modern untuk anak-anak',
-    keywords: 'sanggar tari, tari tradisional, tari modern, anak, budaya, Kendal, Jawa Tengah' + (pageContents.keywords ? `, ${pageContents.keywords}` : ''),
+    description: settings.site_description || 'Sanggar Tari yang mempelajari tarian tradisional untuk anak-anak di daerah Boja Kendal dan sekitarnya. Melestarikan Budaya Indonesia melalui gerakan-gerakan indah untuk mengekspresikan makna dari sebuah tarian.',
+    keywords: 'sanggar tari, tari tradisional, tari modern, anak, budaya, Kendal, Jawa Tengah, Boja, Meteseh' + (pageContents.keywords ? `, ${pageContents.keywords}` : ''),
+
+    // Open Graph untuk social media
     openGraph: {
       title: settings.site_name || 'Sanggar Tari Ngesti Laras Budaya',
       description: settings.site_description || 'Sanggar tari tradisional dan modern untuk anak-anak',
       type: 'website',
-      locale: 'id_ID'
+      locale: 'id_ID',
+      url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}`,
+      siteName: 'Sanggar Tari Ngesti Laras Budaya',
+      images: [{
+        url: `${process.env.NEXT_PUBLIC_APP_URL}/og-image.jpg`,
+        width: 1200,
+        height: 630,
+        alt: 'Sanggar Tari Ngesti Laras Budaya'
+      }]
+    },
+
+    // Twitter Card
+    twitter: {
+      card: 'summary_large_image',
+      title: settings.site_name,
+      description: settings.site_description,
+      images: [`${process.env.NEXT_PUBLIC_APP_URL}/og-image.jpg`]
+    },
+
+    // Canonical URL
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}`
+    },
+
+    // Additional SEO
+    robots: 'index, follow',
+    authors: [{ name: pageContents.author || 'Sanggar Tari Ngesti Laras Budaya' }],
+
+    // Local Business Schema (opsional)
+    other: {
+      'geo.region': 'ID-JT',
+      'geo.placename': 'Kendal',
+      'geo.position': '-6.9175;110.2425' // koordinat Kendal
     }
   }
 }
@@ -45,7 +79,7 @@ async function HeroContent() {
   const settingsResult = await getAllSettings()
   const hero = await getHeroSections()
   const settings = settingsResult.success ? (settingsResult.data as { hero_title?: string; hero_subtitle?: string; hero_cta_text?: string }) : {}
-  
+
   return (
     <HeroSection
       title={settings?.hero_title || 'Selamat Datang di Sanggar Tari Ngesti Laras Budaya'}

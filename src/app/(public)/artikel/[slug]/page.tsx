@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // @/app/(public)/artikel/[slug]/page.tsx
 import "./article-styles.css";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getArticleBySlug, getRecentArticles } from "@/lib/actions/articles-action";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { Calendar, User, ArrowLeft, Clock,  ChartBar } from "lucide-react";
+import { Calendar, User, ArrowLeft, Clock, ChartBar } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDate, formatDateRelative, estimateReadingTime } from "@/lib/utils";
@@ -13,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { ArticleCardEnhanced } from "@/components/molecules/article-card-enhanced";
 import ShareButtons from "./share-buttons";
 import ArticleEnhancements from "./article-enhancements";
-import ScrollToTop from "./scroll-to-top";
+import { getAllSettings } from "@/lib/actions/setting-actions";
 
 interface ArticlePageProps {
     params: Promise<{ slug: string }>;
@@ -22,48 +23,124 @@ interface ArticlePageProps {
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
     const resolvedParams = await params;
     const { slug } = resolvedParams;
-    const articleResult = await getArticleBySlug(slug);
 
+    // Ambil data artikel dan settings
+    const [articleResult, settingsResult] = await Promise.all([
+        getArticleBySlug(slug),
+        getAllSettings()
+    ]);
+
+    // Jika artikel tidak ditemukan
     if (!articleResult) {
         return {
             title: "Artikel Tidak Ditemukan - Sanggar Tari Ngesti Laras Budaya",
+            description: "Artikel yang Anda cari tidak ditemukan. Silakan kembali ke halaman artikel untuk melihat konten lainnya.",
+            robots: "noindex, nofollow"
         };
     }
+
     const article = articleResult;
+    const settings: { site_name?: string; site_description?: string;[key: string]: any } =
+        settingsResult.success && settingsResult.data ? settingsResult.data : {};
+
+    // Buat metadata yang kaya untuk artikel
+    const siteName = settings.site_name || 'Sanggar Tari Ngesti Laras Budaya';
+    const articleTitle = `${article.title} - ${siteName}`;
+    const articleDescription = article.excerpt ||
+        `Baca artikel "${article.title}" dari ${siteName}. Temukan informasi menarik tentang seni tari, budaya Indonesia, dan kegiatan sanggar di Boja, Meteseh, Kendal.`;
+
+    // Keywords yang lebih dinamis berdasarkan konten artikel
+    const baseKeywords = "sanggar tari, ngesti laras budaya, boja, meteseh boja, Kab. Kendal, seni tari, budaya Indonesia";
+    // Fix: Handle tags properly with type checking
+    const articleKeywords = (article as any).tags?.map((tag: { name: string }) => tag.name).join(", ") || "";
+    const combinedKeywords = `${baseKeywords}, ${article.title}, ${articleKeywords}`.replace(/,\s*$/, "");
+
+    // URL gambar untuk sharing
+    const ogImage = article.featuredImage || `${process.env.NEXT_PUBLIC_APP_URL}/og-artikel.jpg`;
+    const articleUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}/artikel/${article.slug}`;
 
     return {
-        title: `${article.title} - Sanggar Tari Ngesti Laras Budaya`,
-        description: article.excerpt || `Baca artikel ${article.title} dari Sanggar Tari Ngesti Laras Budaya`,
-        keywords: `sanggar tari, ngesti laras budaya, boja, meteseh boja, Kab. Kendal, seni tari, budaya, ${article.title}`,
-        viewport: "width=device-width, initial-scale=1",
-        robots: "index, follow",
+        title: articleTitle,
+        description: articleDescription,
+        keywords: combinedKeywords,
+
+        // Open Graph untuk social media
         openGraph: {
             title: article.title,
-            description: article.excerpt || "",
-            url: `https://ngelaras.my.id/artikel/${article.slug}`,
-            siteName: "Sanggar Tari Ngesti Laras Budaya",
+            description: articleDescription,
+            url: articleUrl,
+            siteName: siteName,
             locale: "id_ID",
             type: "article",
-            publishedTime: article.publishedAt ? article.publishedAt.toISOString() : undefined,
-            authors: [article.author?.name || ""],
-            images: article.featuredImage ? [
-                {
-                    url: article.featuredImage,
-                    width: 1200,
-                    height: 630,
-                    alt: article.title,
-                }
-            ] : [],
+            publishedTime: article.publishedAt?.toISOString(),
+            modifiedTime: article.updatedAt?.toISOString(),
+            authors: article.author ? [article.author.name] : [siteName],
+            section: "Artikel Seni Tari",
+            // Fix: Handle tags with proper type checking
+            tags: (article as any).tags?.map((tag: { name: string }) => tag.name) || ["seni tari", "budaya"],
+            images: [{
+                url: ogImage,
+                width: 1200,
+                height: 630,
+                alt: `${article.title} | ${siteName}`,
+                type: "image/jpeg"
+            }]
         },
+
+        // Twitter Card
         twitter: {
             card: "summary_large_image",
             title: article.title,
-            description: article.excerpt || "",
-            images: article.featuredImage ? [article.featuredImage] : [],
+            description: articleDescription,
+            images: [ogImage],
+            // Fix: Remove email reference and simplify creator
+            creator: article.author?.name ? `@${article.author.name.replace(/\s+/g, '').toLowerCase()}` : `@${siteName.replace(/\s+/g, '').toLowerCase()}`
         },
+
+        // Canonical URL
         alternates: {
-            canonical: `https://ngelaras.my.id/artikel/${article.slug}`,
+            canonical: articleUrl,
         },
+
+        // Additional SEO
+        robots: article.status === 'PUBLISHED' ? 'index, follow, max-image-preview:large' : 'noindex, nofollow',
+        authors: [{
+            name: article.author?.name || siteName,
+            // Fix: Remove email reference since it doesn't exist in the type
+            // url: article.author?.email ? `mailto:${article.author.email}` : undefined
+        }],
+
+        // Article specific metadata
+        other: {
+            // Geographic information
+            'geo.region': 'ID-JT',
+            'geo.placename': 'Kendal',
+            'geo.position': '-6.9175;110.2425',
+
+            // Article metadata
+            'article:section': 'Seni Tari',
+            'article:tag': combinedKeywords,
+            // Fix: Handle optional dates properly
+            'article:published_time': article.publishedAt?.toISOString() || '',
+            'article:modified_time': article.updatedAt?.toISOString() || '',
+            'article:author': article.author?.name || siteName,
+
+            // Content type
+            'og:type': 'article',
+            'content-type': 'article',
+
+            // Reading time (estimasi)
+            'twitter:label1': 'Waktu Baca',
+            'twitter:data1': `${Math.ceil(article.content.length / 1000)} menit`,
+            'twitter:label2': 'Dipublikasikan',
+            'twitter:data2': article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('id-ID') : '',
+
+            // Schema.org structured data hints
+            'article:publisher': siteName,
+            'og:site_name': siteName,
+            'og:locale': 'id_ID',
+            'og:locale:alternate': 'en_US'
+        }
     };
 }
 
@@ -190,7 +267,7 @@ async function ArticlePage({ params }: ArticlePageProps) {
                                             <span className="text-sm font-medium">Bagikan artikel ini:</span>
                                         </div>
                                         <ShareButtons
-                                            url={`https://ngelaras.my.id/artikel/${article.slug}`}
+                                            url={`${process.env.NEXT_PUBLIC_BASE_URL}/artikel/${article.slug}`}
                                             title={article.title}
                                         />
                                     </div>
@@ -205,23 +282,7 @@ async function ArticlePage({ params }: ArticlePageProps) {
                                 </div>
 
                                 <div
-                                    className="article-content prose prose-lg max-w-none 
-                                prose-headings:font-bold prose-headings:text-foreground prose-headings:scroll-mt-20
-                                prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:text-base prose-p:mb-6
-                                prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-a:font-medium
-                                prose-strong:text-foreground prose-strong:font-semibold
-                                prose-ul:text-muted-foreground prose-ol:text-muted-foreground
-                                prose-li:mb-2 prose-li:leading-relaxed
-                                prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 
-                                prose-blockquote:rounded-r-lg prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:my-8
-                                prose-blockquote:not-italic prose-blockquote:font-medium
-                                prose-code:bg-muted prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm
-                                prose-pre:bg-muted prose-pre:border prose-pre:rounded-lg prose-pre:p-4
-                                prose-img:rounded-xl prose-img:shadow-lg prose-img:my-8
-                                prose-hr:border-border prose-hr:my-8
-                                prose-table:text-sm prose-table:border-collapse
-                                prose-th:bg-muted prose-th:font-semibold prose-th:p-3 prose-th:text-left
-                                prose-td:p-3 prose-td:border-t prose-td:border-border"
+                                    className="prose prose-lg max-w-none dark:prose-invert"
                                     dangerouslySetInnerHTML={{ __html: article.content }}
                                 />
                             </div>
@@ -329,7 +390,6 @@ async function ArticlePage({ params }: ArticlePageProps) {
                         </div>
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                             {recentArticles.map((recentArticle: any) => (
                                 <div key={recentArticle.id} className="group">
                                     <ArticleCardEnhanced
@@ -353,9 +413,6 @@ async function ArticlePage({ params }: ArticlePageProps) {
                     </section>
                 )}
             </div>
-            {/* Scroll to Top Button */}
-            <ScrollToTop />
-
         </>
     );
 }

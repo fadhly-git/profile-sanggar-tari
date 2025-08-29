@@ -1,7 +1,8 @@
 // @/components/layouts/public-layout.tsx
 import { Header } from "@/components/molecules/main-navigation";
 import { Footer } from "@/components/molecules/main-footer";
-import { PublicScrollArea } from "../public-scroll-area";
+import { PublicScrollArea } from "@/components/public-scroll-area";
+import ScrollToTop from "@/components/atoms/scroll-to-top";
 
 interface PublicLayoutProps {
     children: React.ReactNode;
@@ -14,6 +15,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
                 <Header />
                 <main className="flex-grow">
                     {children}
+                    <ScrollToTop />
                 </main>
                 <Footer />
             </PublicScrollArea>

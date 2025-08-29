@@ -10,19 +10,89 @@ import Link from "next/link";
 import GalleryClientWrapper from "./gallery-client-wrapper";
 
 export const metadata: Metadata = {
-  title: "Galeri - Sanggar Tari Ngesti Laras Budaya",
-  description: "Jelajahi koleksi foto dan video kegiatan, pertunjukan, dan momen berharga dari Sanggar Tari Ngesti Laras Budaya di Boja, Meteseh Boja, Kab. Kendal.",
-  keywords: "sanggar tari, ngesti laras budaya, boja, meteseh boja, Kab. Kendal, galeri foto, video tari, pertunjukan, kegiatan sanggar",
+  title: "Galeri | Sanggar Tari Ngesti Laras Budaya",
+  description: "Jelajahi koleksi foto dan video kegiatan, pertunjukan, dan momen berharga dari Sanggar Tari Ngesti Laras Budaya di Boja, Meteseh Boja, Kab. Kendal. Lihat dokumentasi tari tradisional, pertunjukan, dan kegiatan pembelajaran seni budaya.",
+  keywords: [
+    "sanggar tari",
+    "ngesti laras budaya", 
+    "boja kendal",
+    "meteseh boja",
+    "galeri foto tari",
+    "video pertunjukan",
+    "tari tradisional jawa",
+    "kegiatan sanggar",
+    "dokumentasi tari",
+    "seni budaya indonesia",
+    "pembelajaran tari",
+    "studio dance",
+    "tari anak",
+    "performance dance"
+  ].join(", "),
+  authors: [
+    {
+      name: "Sanggar Tari Ngesti Laras Budaya",
+      url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}`
+    }
+  ],
+  creator: "Sanggar Tari Ngesti Laras Budaya",
+  publisher: "Sanggar Tari Ngesti Laras Budaya",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
-    title: "Galeri - Sanggar Tari Ngesti Laras Budaya",
-    description: "Jelajahi koleksi foto dan video kegiatan, pertunjukan, dan momen berharga dari Sanggar Tari Ngesti Laras Budaya.",
-    url: "https://ngelaras.my.id/galeri",
-    siteName: "Sanggar Tari Ngesti Laras Budaya",
-    locale: "id_ID",
     type: "website",
+    locale: "id_ID",
+    url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}/galeri`,
+    siteName: "Sanggar Tari Ngesti Laras Budaya",
+    title: "Galeri Foto & Video | Sanggar Tari Ngesti Laras Budaya",
+    description: "Koleksi lengkap foto dan video kegiatan, pertunjukan, dan momen berharga dari Sanggar Tari Ngesti Laras Budaya. Saksikan dokumentasi tari tradisional dan pembelajaran seni budaya di Boja, Kendal.",
+    images: [
+      {
+        url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}/images/gallery-og.jpg`,
+        width: 1200,
+        height: 630,
+        alt: "Galeri Sanggar Tari Ngesti Laras Budaya - Foto dan Video Pertunjukan",
+        type: "image/jpeg",
+      },
+      {
+        url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}/images/gallery-square.jpg`, 
+        width: 800,
+        height: 800,
+        alt: "Galeri Sanggar Tari - Dokumentasi Kegiatan",
+        type: "image/jpeg",
+      }
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@ngelarasbudaya",
+    creator: "@ngelarasbudaya", 
+    title: "Galeri Foto & Video | Sanggar Tari Ngesti Laras Budaya",
+    description: "Koleksi lengkap foto dan video kegiatan, pertunjukan, dan momen berharga dari Sanggar Tari Ngesti Laras Budaya.",
+    images: [`${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}/images/gallery-og.jpg`],
   },
   alternates: {
-    canonical: "https://ngelaras.my.id/galeri",
+    canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}/galeri`,
+    languages: {
+      "id-ID": `${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}/galeri`,
+    },
+  },
+  category: "Arts & Culture",
+  classification: "Gallery",
+  other: {
+    "format-detection": "telephone=no",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "default",
+    "msapplication-TileColor": "#2B5797",
+    "theme-color": "#ffffff",
   },
 };
 

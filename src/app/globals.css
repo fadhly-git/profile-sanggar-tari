@@ -127,50 +127,68 @@ html, body {
 }
 
 .prose {
-  @apply text-gray-700 leading-relaxed;
+  @apply text-foreground leading-relaxed max-w-none; /* Hapus text-pink-400, ganti dengan text-foreground */
+  color: inherit; /* Pastikan warna mengikuti theme */
 }
 
 .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-  @apply font-semibold text-gray-900 mt-8 mb-4;
+  @apply font-bold text-foreground mt-8 mb-4 leading-tight;
+  color: inherit;
 }
 
-.prose h1 { @apply text-2xl; }
-.prose h2 { @apply text-xl; }
-.prose h3 { @apply text-lg; }
+.prose h1 { 
+  @apply text-3xl md:text-4xl mb-6;
+}
+.prose h2 { 
+  @apply text-2xl md:text-3xl mb-5;
+}
+.prose h3 { 
+  @apply text-xl md:text-2xl mb-4;
+}
+.prose h4 { 
+  @apply text-lg md:text-xl mb-3;
+}
+.prose h5 { 
+  @apply text-base md:text-lg mb-3;
+}
+.prose h6 { 
+  @apply text-sm md:text-base mb-2;
+}
 
 .prose p {
-  @apply mb-4;
+  @apply mb-6 text-base md:text-lg leading-7;
+  color: inherit;
 }
 
 /* Perbaikan untuk lists */
 .prose ul, .prose ol {
-  @apply mb-4 pl-6;
+  @apply mb-6 pl-6;
 }
 
 .prose ul {
-  list-style-type: disc; /* Tambahkan bullet points */
+  list-style-type: disc;
 }
 
 .prose ol {
-  list-style-type: decimal; /* Tambahkan numbering */
+  list-style-type: decimal;
 }
 
 .prose ul ul {
-  list-style-type: circle; /* Nested bullets */
+  list-style-type: circle;
 }
 
 .prose ol ol {
-  list-style-type: lower-alpha; /* Nested numbering */
+  list-style-type: lower-alpha;
 }
 
 .prose li {
-  @apply mb-2;
-  display: list-item; /* Pastikan display sebagai list item */
+  @apply mb-2 text-base md:text-lg;
+  display: list-item;
+  color: inherit;
 }
 
-/* Hilangkan margin pada paragraf dalam list item */
 .prose li p {
-  @apply mb-1;
+  @apply mb-2;
 }
 
 .prose li p:last-child {
@@ -178,26 +196,56 @@ html, body {
 }
 
 .prose blockquote {
-  @apply border-l-4 border-[#07b8b2] pl-4 italic bg-gray-50 py-2 my-4;
+  @apply border-l-4 border-primary pl-6 italic bg-muted/30 py-4 my-6 rounded-r-lg;
+  color: inherit;
 }
 
 .prose img {
-  @apply rounded-lg mx-auto my-6;
+  @apply rounded-lg mx-auto my-8 shadow-md;
+  max-width: 100%;
+  height: auto;
 }
 
 .prose table {
-  @apply w-full border-collapse border border-gray-300 my-6;
+  @apply w-full border-collapse border border-border my-6 rounded-lg overflow-hidden;
 }
 
 .prose th, .prose td {
-  @apply border border-gray-300 px-4 py-2;
+  @apply border border-border px-4 py-3;
 }
 
 .prose th {
-  @apply bg-gray-50 font-semibold;
+  @apply bg-muted font-semibold;
 }
 
-/* Tambahkan ke global.css atau di komponen */
+.prose a {
+  @apply text-primary hover:text-primary/80 underline transition-colors;
+}
+
+.prose strong {
+  @apply font-bold;
+  color: inherit;
+}
+
+.prose em {
+  @apply italic;
+  color: inherit;
+}
+
+.prose code {
+  @apply bg-muted px-2 py-1 rounded text-sm font-mono;
+  color: inherit;
+}
+
+.prose pre {
+  @apply bg-muted p-4 rounded-lg overflow-x-auto my-6;
+}
+
+.prose pre code {
+  @apply bg-transparent p-0;
+}
+
+/* Remove conflicting styles */
 .rich-text-viewer .ProseMirror {
   outline: none !important;
   border: none !important;

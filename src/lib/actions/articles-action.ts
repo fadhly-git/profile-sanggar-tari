@@ -33,7 +33,8 @@ export async function createArticle(data: CreateArticleData) {
     })
 
     revalidatePath('/admin/articles')
-    revalidatePath(`/articles/${article.id}`)
+    revalidatePath(`/artikel/${article.id}`)
+    revalidatePath('/artikel')
     return { success: true, data: article }
   } catch (error) {
     console.error('Error creating article:', error)
@@ -65,6 +66,8 @@ export async function updateArticle(data: Article) {
 
     revalidatePath('/admin/articles')
     revalidatePath(`/articles/${data.id}`)
+    revalidatePath('/artikel')
+    revalidatePath(`/artikel/${data.slug}`)
     return { success: true, data: article }
   } catch (error) {
     console.error('Error updating article:', error)
@@ -80,6 +83,8 @@ export async function deleteArticle(id: string) {
     })
 
     revalidatePath('/admin/articles')
+    revalidatePath('/artikel')
+    revalidatePath('/', 'layout') // Clears entire layout cache
     return { success: true }
   } catch (error) {
     console.error('Error deleting article:', error)

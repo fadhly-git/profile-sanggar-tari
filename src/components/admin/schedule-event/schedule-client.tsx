@@ -256,7 +256,7 @@ export function ScheduleClientPage({ currentUserId, data }: SchedulePageProps) {
             />
 
             <Dialog open={isFormOpen} onOpenChange={handleCloseForm}>
-                <DialogContent className="!max-w-2xl max-h-[90vh] overflow-auto">
+                <DialogContent className="!max-w-4xl max-h-[90vh] overflow-auto">
                     <DialogHeader>
                         <DialogTitle>
                             {editingEvent ? 'Edit Jadwal Kegiatan' : 'Tambah Jadwal Kegiatan'}

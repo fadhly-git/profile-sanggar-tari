@@ -9,23 +9,85 @@ import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { MissionCard } from "@/components/molecules/mission-card";
 import Link from "next/link";
+import { getAllSettings } from "@/lib/actions/setting-actions";
 
-export const metadata: Metadata = {
-    title: "Tentang Kami - Sanggar Tari Ngesti Laras Budaya",
-    description: "Mengenal lebih dekat Sanggar Tari Ngesti Laras Budaya, sejarah, visi misi, dan komitmen kami dalam melestarikan seni tari tradisional dan modern di Boja, Meteseh Boja, Kab. Kendal sejak 2023.",
-    keywords: "sanggar tari, ngesti laras budaya, boja, meteseh boja, Kab. Kendal, seni tari, budaya, tentang kami, sejarah sanggar, visi misi",
-    openGraph: {
-        title: "Tentang Kami - Sanggar Tari Ngesti Laras Budaya",
-        description: "Mengenal lebih dekat Sanggar Tari Ngesti Laras Budaya, sejarah, visi misi, dan komitmen kami dalam melestarikan seni tari.",
-        url: "https://ngelaras.my.id/tentang-kami",
-        siteName: "Sanggar Tari Ngesti Laras Budaya",
-        locale: "id_ID",
-        type: "website",
-    },
-    alternates: {
-        canonical: "https://ngelaras.my.id/tentang-kami",
-    },
-};
+// Ubah dari static metadata menjadi dynamic generateMetadata function
+export async function generateMetadata(): Promise<Metadata> {
+    // Ambil data dari database
+    const settingsResult = await getAllSettings();
+    const aboutResult = await getPageContentWithParsedMetadata("about_us");
+    const pageMetaResult = await getPageContentWithParsedMetadata("tentang_kami_meta");
+
+    // Extract data dengan fallback
+    const settings: { site_name?: string; site_description?: string;[key: string]: any } =
+        settingsResult.success && settingsResult.data ? settingsResult.data : {};
+
+    const aboutData = aboutResult.success && aboutResult.data ? aboutResult.data : null;
+    const pageMetaData = pageMetaResult.success && pageMetaResult.data ? pageMetaResult.data : null;
+
+    // Ambil metadata dari database atau gunakan default
+    const pageTitle = pageMetaData?.title || `Tentang Kami | ${settings.site_name || 'Sanggar Tari Ngesti Laras Budaya'}`;
+    const pageDescription = pageMetaData?.parsedMetadata?.description ||
+        aboutData?.parsedMetadata?.description ||
+        "Mengenal lebih dekat Sanggar Tari Ngesti Laras Budaya, sejarah, visi misi, dan komitmen kami dalam melestarikan seni tari tradisional dan modern di Boja, Meteseh Boja, Kab. Kendal sejak 2023.";
+
+    const pageKeywords = pageMetaData?.parsedMetadata?.keywords ||
+        "sanggar tari, ngesti laras budaya, boja, meteseh boja, Kab. Kendal, seni tari, budaya, tentang kami, sejarah sanggar, visi misi";
+
+    const ogImage = pageMetaData?.parsedMetadata?.og_image ||
+        aboutData?.parsedMetadata?.image ||
+        `${process.env.NEXT_PUBLIC_APP_URL}/og-tentang-kami.jpg`;
+
+    const foundedYear = aboutData?.parsedMetadata?.founded_year || "2023";
+
+    return {
+        title: pageTitle,
+        description: pageDescription,
+        keywords: pageKeywords,
+
+        openGraph: {
+            title: pageTitle,
+            description: pageDescription,
+            url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}/tentang-kami`,
+            siteName: settings.site_name || "Sanggar Tari Ngesti Laras Budaya",
+            locale: "id_ID",
+            type: "website",
+            images: [{
+                url: ogImage,
+                width: 1200,
+                height: 630,
+                alt: `Tentang ${settings.site_name || 'Sanggar Tari Ngesti Laras Budaya'} | Berdiri sejak ${foundedYear}`
+            }]
+        },
+
+        twitter: {
+            card: 'summary_large_image',
+            title: pageTitle,
+            description: pageDescription,
+            images: [ogImage]
+        },
+
+        alternates: {
+            canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}/tentang-kami`,
+        },
+
+        robots: pageMetaData?.parsedMetadata?.robots || 'index, follow',
+        authors: [{
+            name: pageMetaData?.parsedMetadata?.author ||
+                aboutData?.parsedMetadata?.author ||
+                'Sanggar Tari Ngesti Laras Budaya'
+        }],
+
+        // Local Business Schema
+        other: {
+            'geo.region': 'ID-JT',
+            'geo.placename': 'Kendal',
+            'geo.position': '-6.9175;110.2425',
+            'article:section': 'Tentang Kami',
+            'article:tag': pageKeywords
+        }
+    };
+}
 
 async function AboutPage() {
     // Ambil konten dari database
@@ -216,15 +278,16 @@ Seiring berjalannya waktu, antusiasme masyarakat semakin tinggi dan kami pun ber
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {missionData.map((mission: any, index: number) => {
-                            console.log(mission);
-                            return(
-                            <MissionCard
-                                key={index}
-                                title={mission.title}
-                                description={mission.description}
-                                icon={mission.image}
-                            />
-                        )})}
+
+                            return (
+                                <MissionCard
+                                    key={index}
+                                    title={mission.title}
+                                    description={mission.description}
+                                    icon={mission.image}
+                                />
+                            )
+                        })}
                     </div>
                 </section>
 

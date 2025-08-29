@@ -111,17 +111,19 @@ enum MediaType {
 
 // Model untuk Jadwal/Kalender Kegiatan
 model ScheduleEvent {
-  id            String         @id @default(cuid())
-  title         String
-  description   String?        @db.Text
-  startDate     DateTime
-  endDate       DateTime?
-  location      String?        @db.LongText
-  isRecurring   Boolean        @default(false)
-  recurringType RecurringType?
-  isActive      Boolean        @default(true)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id              String         @id @default(cuid())
+  title           String
+  description     String?        @db.Text
+  startDate       DateTime
+  endDate         DateTime?
+  location        String?        @db.LongText
+  isRecurring     Boolean        @default(false)
+  recurringType   RecurringType?
+  recurringEndDate DateTime?      // Tanggal akhir recurring
+  exceptions      Json?          // Array tanggal libur dalam format JSON
+  isActive        Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
   // Relations
   authorId String

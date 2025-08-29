@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { WhatsappIcon, XIcon } from "@/components/atoms/d";
+import { TelegramIcon, WhatsappIcon, XIcon } from "@/components/atoms/d";
 
 interface ShareButtonsProps {
   url: string;
@@ -70,7 +70,9 @@ export default function ShareButtons({ url, title, size = "default" }: ShareButt
           onClick={() => handleShare('facebook')}
           className="text-white bg-blue-600 border-blue-600 hover:bg-blue-700 hover:border-blue-700 transition-all duration-300 shadow-md hover:shadow-lg"
         >
-          <span className="text-lg">�</span>
+          <span className="text-lg mr-2 bg-blue-600 p-0.5 rounded-md">
+            <FacebookIcon className="h-4 w-4" />
+          </span>
           {size === "default" && <span className="ml-1">FB</span>}
         </Button>
       </div>
@@ -122,11 +124,15 @@ export default function ShareButtons({ url, title, size = "default" }: ShareButt
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48 border-border/50 shadow-lg">
           <DropdownMenuItem onClick={() => handleShare('telegram')} className="hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-colors cursor-pointer">
-            <span className="text-lg mr-3">✈️</span>
+            <span className="text-lg mr-3">
+              <TelegramIcon className="h-5 w-5 text-blue-500 bg-white rounded-full" />
+            </span>
             Telegram
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleShare('twitter')} className="hover:bg-sky-50 dark:hover:bg-sky-950/20 transition-colors cursor-pointer sm:hidden">
-            <span className="text-lg mr-3">🐦</span>
+            <span className="text-lg mr-2 bg-black p-0.5 rounded-md">
+              <XIcon className="h-4 w-4" />
+            </span>
             Twitter
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleCopyLink} className="hover:bg-green-50 dark:hover:bg-green-950/20 transition-colors cursor-pointer">

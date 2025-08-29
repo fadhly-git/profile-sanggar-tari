@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import type { ScheduleEvent } from '@/types/schedule'
-import { RecurringType } from '@prisma/client'
+import { RecurringType, Prisma } from '@prisma/client'
 
 // Schema validation
 const scheduleSchema = z.object({
@@ -16,6 +16,8 @@ const scheduleSchema = z.object({
     isActive: z.boolean().default(true),
     isRecurring: z.boolean().default(false),
     recurringType: z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']).optional().nullable(),
+    recurringEndDate: z.date().optional().nullable(),
+    exceptions: z.array(z.date()).optional(),
 })
 
 export async function getUpcomingSchedules(limit: number = 5) {
@@ -65,25 +67,34 @@ export async function getScheduleEvents(): Promise<ScheduleEvent[]> {
         })
 
         // Transform data to match ScheduleEvent interface
-        return events.map(event => ({
-            id: event.id,
-            title: event.title,
-            description: event.description || undefined,
-            startDate: new Date(event.startDate),
-            endDate: event.endDate ? new Date(event.endDate) : null,
-            location: event.location || undefined,
-            isActive: event.isActive,
-            isRecurring: event.isRecurring,
-            recurringType: event.recurringType || null,
-            authorId: event.authorId,
-            createdAt: new Date(event.createdAt),
-            updatedAt: new Date(event.updatedAt),
-            author: {
-                id: event.author.id,
-                name: event.author.name || 'Unknown',
-                email: event.author.email,
+        return events.map(event => {
+            // Type the event with proper Prisma include type
+            const eventData = event as typeof event & {
+                exceptions?: string | null;
+                recurringEndDate?: Date | null;
+            };
+            return {
+                id: eventData.id,
+                title: eventData.title,
+                description: eventData.description || undefined,
+                startDate: new Date(eventData.startDate),
+                endDate: eventData.endDate ? new Date(eventData.endDate) : null,
+                location: eventData.location || undefined,
+                isActive: eventData.isActive,
+                isRecurring: eventData.isRecurring,
+                recurringType: eventData.recurringType || null,
+                recurringEndDate: eventData.recurringEndDate ? new Date(eventData.recurringEndDate) : null,
+                exceptions: eventData.exceptions ? JSON.parse(eventData.exceptions as string).map((date: string) => new Date(date)) : [],
+                authorId: eventData.authorId,
+                createdAt: new Date(eventData.createdAt),
+                updatedAt: new Date(eventData.updatedAt),
+                author: {
+                    id: eventData.author.id,
+                    name: eventData.author.name || 'Unknown',
+                    email: eventData.author.email,
+                }
             }
-        }))
+        })
     } catch (error) {
         console.error('Error fetching schedule events:', error)
         throw new Error('Gagal mengambil data jadwal kegiatan')
@@ -117,6 +128,8 @@ export async function getScheduleEventById(id: string): Promise<ScheduleEvent | 
             isActive: event.isActive,
             isRecurring: event.isRecurring,
             recurringType: event.recurringType || null,
+            recurringEndDate: event.recurringEndDate ? new Date(event.recurringEndDate) : null,
+            exceptions: event.exceptions ? JSON.parse(event.exceptions as string).map((date: string) => new Date(date)) : [],
             authorId: event.authorId,
             createdAt: new Date(event.createdAt),
             updatedAt: new Date(event.updatedAt),
@@ -138,6 +151,7 @@ export async function createScheduleEvent(data: z.infer<typeof scheduleSchema> &
             ...data,
             startDate: new Date(data.startDate),
             endDate: data.endDate ? new Date(data.endDate) : null,
+            recurringEndDate: data.recurringEndDate ? new Date(data.recurringEndDate) : null,
         })
 
         const event = await prisma.scheduleEvent.create({
@@ -150,6 +164,8 @@ export async function createScheduleEvent(data: z.infer<typeof scheduleSchema> &
                 isActive: validatedData.isActive,
                 isRecurring: validatedData.isRecurring,
                 recurringType: validatedData.recurringType as RecurringType | null,
+                recurringEndDate: validatedData.recurringEndDate,
+                exceptions: validatedData.exceptions ? JSON.stringify(validatedData.exceptions.map(date => date.toISOString())) : Prisma.JsonNull,
                 authorId: data.authorId,
             },
             include: {
@@ -164,6 +180,7 @@ export async function createScheduleEvent(data: z.infer<typeof scheduleSchema> &
         })
 
         revalidatePath('/admin/schedule')
+        revalidatePath('/')
         return {
             success: true,
             message: 'Jadwal kegiatan berhasil dibuat',
@@ -183,16 +200,8 @@ export async function updateScheduleEvent(
     data: Partial<z.infer<typeof scheduleSchema>>
 ) {
     try {
-        const updateData: Partial<{
-            title: string
-            description: string | null
-            startDate: Date
-            endDate: Date | null
-            location: string | null
-            isActive: boolean
-            isRecurring: boolean
-            recurringType: RecurringType | null
-        }> = {}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const updateData: any = {}
 
         if (data.title !== undefined) updateData.title = data.title
         if (data.description !== undefined) updateData.description = data.description || null
@@ -202,6 +211,8 @@ export async function updateScheduleEvent(
         if (data.isActive !== undefined) updateData.isActive = data.isActive
         if (data.isRecurring !== undefined) updateData.isRecurring = data.isRecurring
         if (data.recurringType !== undefined) updateData.recurringType = data.recurringType as RecurringType | null
+        if (data.recurringEndDate !== undefined) updateData.recurringEndDate = data.recurringEndDate ? new Date(data.recurringEndDate) : null
+        if (data.exceptions !== undefined) updateData.exceptions = data.exceptions ? JSON.stringify(data.exceptions.map(date => date.toISOString())) : null
 
         const event = await prisma.scheduleEvent.update({
             where: { id },
@@ -218,6 +229,7 @@ export async function updateScheduleEvent(
         })
 
         revalidatePath('/admin/schedule')
+        revalidatePath('/', 'layout')
         return {
             success: true,
             message: 'Jadwal kegiatan berhasil diperbarui',
@@ -239,6 +251,7 @@ export async function deleteScheduleEvent(id: string) {
         })
 
         revalidatePath('/admin/schedule')
+        revalidatePath('/', 'layout')
         return {
             success: true,
             message: 'Jadwal kegiatan berhasil dihapus'

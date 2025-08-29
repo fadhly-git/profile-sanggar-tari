@@ -20,6 +20,8 @@ export async function createHeroSection(data: HeroSectionFormData) {
         })
 
         revalidatePath('/admin/hero-sections')
+        revalidatePath('/', 'layout')
+        revalidatePath('/')
         return { success: true, data: heroSection }
     } catch (error) {
         console.error('Error creating hero section:', error)
@@ -38,6 +40,8 @@ export async function updateHeroSection(id: string, data: HeroSectionFormData) {
         })
 
         revalidatePath('/admin/hero-sections')
+        revalidatePath('/', 'layout')
+        revalidatePath('/')
         return { success: true, data: heroSection }
     } catch (error) {
         console.error('Error updating hero section:', error)
@@ -52,6 +56,8 @@ export async function deleteHeroSection(id: string) {
         })
 
         revalidatePath('/admin/hero-sections')
+        revalidatePath('/', 'layout')
+        revalidatePath('/')
         return { success: true }
     } catch (error) {
         console.error('Error deleting hero section:', error)

@@ -94,6 +94,9 @@ export async function createGalleryItem(data: CreateGalleryItem) {
     })
 
     revalidatePath('/admin/gallery/')
+    revalidatePath('/gallery')
+    revalidatePath('/', 'layout') // Clears entire layout cache
+    revalidatePath('/gallery/' + (galleryItem.category ? galleryItem.category.slug : ''))
     return { success: true, data: galleryItem }
   } catch (error) {
     console.error('Error creating gallery item:', error)
@@ -127,6 +130,9 @@ export async function updateGalleryItem(data: UpdateGalleryItem) {
     })
 
     revalidatePath('/admin/gallery')
+    revalidatePath('/gallery')
+    revalidatePath('/', 'layout') // Clears entire layout cache
+    revalidatePath('/gallery/' + (item.category ? item.category.slug : ''))
     return { success: true, data: item }
   } catch (error) {
     console.error('Error updating gallery item:', error)
@@ -141,6 +147,8 @@ export async function deleteGalleryItem(id: string) {
     })
 
     revalidatePath('/admin/gallery')
+    revalidatePath('/gallery')
+    revalidatePath('/', 'layout')
     return { success: true }
   } catch (error) {
     console.error('Error deleting gallery item:', error)

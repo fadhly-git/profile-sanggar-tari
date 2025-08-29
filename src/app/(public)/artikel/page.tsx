@@ -8,23 +8,83 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import ArticlePagination from "./article-pagination";
+import { getAllSettings } from "@/lib/actions/setting-actions";
+import { getPageContentWithParsedMetadata } from "@/lib/actions/page-content-actions";
 
-export const metadata: Metadata = {
-    title: "Artikel - Sanggar Tari Ngesti Laras Budaya",
-    description: "Baca artikel terbaru tentang seni tari, budaya Indonesia, tips pembelajaran tari, dan berita kegiatan dari Sanggar Tari Ngesti Laras Budaya di Boja, Meteseh Boja, Kab. Kendal.",
-    keywords: "sanggar tari, ngesti laras budaya, boja, meteseh boja, Kab. Kendal, seni tari, budaya, artikel tari, berita sanggar, tips tari",
-    openGraph: {
-        title: "Artikel - Sanggar Tari Ngesti Laras Budaya",
-        description: "Baca artikel terbaru tentang seni tari, budaya Indonesia, tips pembelajaran tari, dan berita kegiatan dari Sanggar Tari Ngesti Laras Budaya.",
-        url: "https://ngelaras.my.id/artikel",
-        siteName: "Sanggar Tari Ngesti Laras Budaya",
-        locale: "id_ID",
-        type: "website",
-    },
-    alternates: {
-        canonical: "https://ngelaras.my.id/artikel",
-    },
-};
+// Ubah dari static metadata menjadi dynamic generateMetadata function
+export async function generateMetadata(): Promise<Metadata> {
+    // Ambil data dari database
+    const settingsResult = await getAllSettings();
+    const pageMetaResult = await getPageContentWithParsedMetadata("artikel-meta");
+
+    // Extract data dengan fallback
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const settings: { site_name?: string; site_description?: string;[key: string]: any } =
+        settingsResult.success && settingsResult.data ? settingsResult.data : {};
+
+    const pageMetaData = pageMetaResult.success && pageMetaResult.data ? pageMetaResult.data : null;
+
+    // Ambil metadata dari database atau gunakan default
+    const pageTitle = pageMetaData?.title || `Artikel | ${settings.site_name || 'Sanggar Tari Ngesti Laras Budaya'}`;
+    const pageDescription = pageMetaData?.parsedMetadata?.description ||
+        "Baca artikel terbaru tentang seni tari, budaya Indonesia, tips pembelajaran tari, dan berita kegiatan dari Sanggar Tari Ngesti Laras Budaya di Boja, Meteseh Boja, Kab. Kendal.";
+
+    const pageKeywords = pageMetaData?.parsedMetadata?.keywords ||
+        "sanggar tari, ngesti laras budaya, boja, meteseh boja, Kab. Kendal, seni tari, budaya, artikel tari, berita sanggar, tips tari";
+
+    const ogImage = pageMetaData?.parsedMetadata?.og_image ||
+        `${process.env.NEXT_PUBLIC_APP_URL}/og-artikel.jpg`;
+
+    return {
+        title: pageTitle,
+        description: pageDescription,
+        keywords: pageKeywords,
+
+        openGraph: {
+            title: pageTitle,
+            description: pageDescription,
+            url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}/artikel`,
+            siteName: settings.site_name || "Sanggar Tari Ngesti Laras Budaya",
+            locale: "id_ID",
+            type: "website",
+            images: [{
+                url: ogImage,
+                width: 1200,
+                height: 630,
+                alt: `Artikel ${settings.site_name || 'Sanggar Tari Ngesti Laras Budaya'} | Seni Tari dan Budaya Indonesia`
+            }]
+        },
+
+        twitter: {
+            card: 'summary_large_image',
+            title: pageTitle,
+            description: pageDescription,
+            images: [ogImage]
+        },
+
+        alternates: {
+            canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://ngelaras.my.id'}/artikel`,
+        },
+
+        robots: pageMetaData?.parsedMetadata?.robots || 'index, follow',
+        authors: [{
+            name: pageMetaData?.parsedMetadata?.author ||
+                settings.site_name ||
+                'Sanggar Tari Ngesti Laras Budaya'
+        }],
+
+        // Additional SEO for article listing page
+        other: {
+            'geo.region': 'ID-JT',
+            'geo.placename': 'Kendal',
+            'geo.position': '-6.9175;110.2425',
+            'article:section': 'Artikel',
+            'article:tag': pageKeywords,
+            'og:type': 'website',
+            'content-type': 'article-list'
+        }
+    };
+}
 
 interface ArticlePageProps {
     searchParams: Promise<{

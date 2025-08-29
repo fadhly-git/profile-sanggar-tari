@@ -10,6 +10,8 @@ export interface ScheduleEvent {
   isActive: boolean
   isRecurring: boolean
   recurringType?: RecurringType | null // bisa undefined atau null
+  recurringEndDate?: Date | null // Tanggal akhir recurring
+  exceptions?: Date[] // Array tanggal libur
   authorId: string
   createdAt: Date
   updatedAt: Date
@@ -30,6 +32,8 @@ export interface ScheduleFormData {
   location: string
   isRecurring: boolean
   recurringType?: RecurringType | null
+  recurringEndDate?: string
+  exceptions?: Date[]
 }
 
 export interface CreateScheduleEventData {
@@ -41,6 +45,8 @@ export interface CreateScheduleEventData {
     isActive?: boolean
     isRecurring: boolean
     recurringType?: RecurringType | null
+    recurringEndDate?: Date | null
+    exceptions?: Date[]
     authorId: string
 }
 

@@ -10,7 +10,6 @@ interface MissionCardProps {
 }
 
 export function MissionCard({ title, description, icon, className = "" }: MissionCardProps) {
-    console.log(icon);
     return (
         <Card className={`hover:shadow-lg transition-all duration-300 group ${className}`}>
             <CardHeader className="text-center">

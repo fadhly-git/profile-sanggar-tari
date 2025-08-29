@@ -1,7 +1,7 @@
-// @/components/molecules/schedule-card.tsx
+// @/components/molecules/schedule-card-improved.tsx
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Calendar, Clock, MapPin, Repeat, AlertTriangle } from 'lucide-react'
-import { format, addWeeks, addMonths, addYears, isAfter, isBefore, startOfDay } from 'date-fns'
+import { format, addWeeks, addMonths, addYears, isAfter, isBefore, startOfDay, getDay, setDay } from 'date-fns'
 import { id } from 'date-fns/locale'
 import { Badge } from '@/components/ui/badge'
 import { RecurringType } from '@prisma/client'
@@ -14,30 +14,31 @@ interface ScheduleCardProps {
     location?: string
     isRecurring?: boolean
     recurringType?: RecurringType
-    recurringEndDate?: Date // Batasan akhir recurring
+    recurringEndDate?: Date
     showNextOccurrences?: number
-    exceptions?: Date[] // Tanggal-tanggal yang dikecualikan (libur)
+    exceptions?: Date[]
 }
 
-const getRecurringText = (startDate: Date, type: RecurringType) => {
+const getRecurringText = (startDate: Date, type: RecurringType, endDate?: Date) => {
     const dayOfWeek = format(startDate, 'EEEE', { locale: id })
     const dayOfMonth = format(startDate, 'd')
     const month = format(startDate, 'MMMM', { locale: id })
-    const time = format(startDate, 'HH:mm')
+    const startTime = format(startDate, 'HH:mm')
+    const endTime = endDate ? ` - ${format(endDate, 'HH:mm')}` : ''
 
     switch (type) {
         case 'WEEKLY':
-            return `Setiap ${dayOfWeek} pukul ${time}`
+            return `Setiap ${dayOfWeek} pukul ${startTime}${endTime}`
         case 'MONTHLY':
-            return `Setiap tanggal ${dayOfMonth} pukul ${time}`
+            return `Setiap tanggal ${dayOfMonth} pukul ${startTime}${endTime}`
         case 'YEARLY':
-            return `Setiap ${dayOfMonth} ${month} pukul ${time}`
+            return `Setiap ${dayOfMonth} ${month} pukul ${startTime}${endTime}`
         default:
-            return 'Berulang'
+            return `Berulang pukul ${startTime}${endTime}`
     }
 }
 
-export default function ScheduleCard({
+export default function ScheduleCardImproved({
     title,
     description,
     startDate,
@@ -50,32 +51,53 @@ export default function ScheduleCard({
     exceptions = []
 }: ScheduleCardProps) {
 
-    // Function untuk mencari next occurrence dari sekarang
-    const getNextOccurrenceFromNow = () => {
-        if (!isRecurring || !recurringType) return null
-
+    // Helper function untuk mencari next valid date berdasarkan recurring type
+    const getNextValidDate = (baseDate: Date, type: RecurringType) => {
         const now = new Date()
         const today = startOfDay(now)
-        let nextDate = new Date(startDate)
+        let nextDate = new Date(baseDate)
 
-        // Jika start date sudah lewat, cari occurrence berikutnya
-        while (isBefore(startOfDay(nextDate), today)) {
-            switch (recurringType) {
-                case 'WEEKLY':
-                    nextDate = addWeeks(nextDate, 1)
-                    break
-                case 'MONTHLY':
+        // Jika bukan recurring, return as is
+        if (!isRecurring) return baseDate
+
+        // Untuk recurring, cari next occurrence dari hari ini
+        switch (type) {
+            case 'WEEKLY':
+                // Cari hari yang sama di minggu ini atau selanjutnya
+                const targetDayOfWeek = getDay(baseDate)
+                const currentDayOfWeek = getDay(today)
+                
+                if (targetDayOfWeek >= currentDayOfWeek) {
+                    // Masih ada di minggu ini
+                    nextDate = setDay(today, targetDayOfWeek)
+                } else {
+                    // Minggu depan
+                    nextDate = setDay(addWeeks(today, 1), targetDayOfWeek)
+                }
+                
+                // Set time sesuai dengan original
+                nextDate.setHours(baseDate.getHours(), baseDate.getMinutes(), 0, 0)
+                break
+
+            case 'MONTHLY':
+                // Set tanggal yang sama di bulan ini atau selanjutnya
+                nextDate = new Date(today.getFullYear(), today.getMonth(), baseDate.getDate())
+                nextDate.setHours(baseDate.getHours(), baseDate.getMinutes(), 0, 0)
+                
+                if (isBefore(nextDate, today)) {
                     nextDate = addMonths(nextDate, 1)
-                    break
-                case 'YEARLY':
-                    nextDate = addYears(nextDate, 1)
-                    break
-            }
-        }
+                }
+                break
 
-        // Check apakah masih dalam batas recurring end date
-        if (recurringEndDate && isAfter(nextDate, recurringEndDate)) {
-            return null
+            case 'YEARLY':
+                // Set tanggal yang sama di tahun ini atau selanjutnya
+                nextDate = new Date(today.getFullYear(), baseDate.getMonth(), baseDate.getDate())
+                nextDate.setHours(baseDate.getHours(), baseDate.getMinutes(), 0, 0)
+                
+                if (isBefore(nextDate, today)) {
+                    nextDate = addYears(nextDate, 1)
+                }
+                break
         }
 
         return nextDate
@@ -86,22 +108,20 @@ export default function ScheduleCard({
         if (!isRecurring || !recurringType) return []
 
         const occurrences = []
-        const nextOccurrence = getNextOccurrenceFromNow()
+        const nextOccurrence = getNextValidDate(startDate, recurringType)
         
-        if (!nextOccurrence) return []
-
         let currentDate = new Date(nextOccurrence)
 
         for (let i = 0; i < showNextOccurrences; i++) {
-            // Check apakah tanggal ini dikecualikan (libur)
-            const isException = exceptions.some(exception => 
-                startOfDay(exception).getTime() === startOfDay(currentDate).getTime()
-            )
-
             // Check apakah masih dalam batas recurring end date
             if (recurringEndDate && isAfter(currentDate, recurringEndDate)) {
                 break
             }
+
+            // Check apakah tanggal ini dikecualikan (libur)
+            const isException = exceptions.some(exception => 
+                startOfDay(exception).getTime() === startOfDay(currentDate).getTime()
+            )
 
             let nextEndDate = endDate ? new Date(endDate) : undefined
             if (nextEndDate && endDate) {
@@ -146,10 +166,9 @@ export default function ScheduleCard({
     }
 
     const upcomingOccurrences = getUpcomingOccurrences()
-    const nextOccurrence = getNextOccurrenceFromNow()
 
     // Jika recurring tapi tidak ada occurrence berikutnya, jangan tampilkan
-    if (isRecurring && !nextOccurrence) {
+    if (isRecurring && upcomingOccurrences.length === 0) {
         return null
     }
 
@@ -157,13 +176,10 @@ export default function ScheduleCard({
     const renderLocation = () => {
         if (!location) return null
 
-        // Check jika location adalah iframe Google Maps
         const iframeMatch = location.match(/<iframe[^>]*src="([^"]*)"[^>]*><\/iframe>/i)
 
         if (iframeMatch) {
-            // Extract src URL dari iframe
             const srcUrl = iframeMatch[1]
-
             return (
                 <div className="space-y-2">
                     <div className="flex items-center space-x-2 text-sm">
@@ -185,7 +201,6 @@ export default function ScheduleCard({
                 </div>
             )
         } else {
-            // Jika bukan iframe, tampilkan sebagai text biasa
             return (
                 <div className="flex items-start space-x-2 text-sm">
                     <MapPin className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
@@ -205,7 +220,7 @@ export default function ScheduleCard({
     }
 
     return (
-        <Card>
+        <Card className="relative">
             <CardHeader>
                 <div className="flex items-start justify-between">
                     <h3 className="font-semibold">{title}</h3>
@@ -234,7 +249,7 @@ export default function ScheduleCard({
                         <Calendar className="h-4 w-4 text-primary" />
                         <span className="font-medium">
                             {isRecurring && recurringType ? (
-                                getRecurringText(startDate, recurringType)
+                                getRecurringText(startDate, recurringType, endDate)
                             ) : (
                                 <>
                                     {format(startDate, 'dd MMMM yyyy', { locale: id })}
@@ -246,7 +261,7 @@ export default function ScheduleCard({
                         </span>
                     </div>
                     
-                    {/* Show specific time for non-recurring or next occurrence */}
+                    {/* Show specific time for non-recurring */}
                     {!isRecurring && (
                         <div className="flex items-center space-x-2 text-sm">
                             <Clock className="h-4 w-4 text-primary" />
@@ -307,3 +322,6 @@ export default function ScheduleCard({
         </Card>
     )
 }
+
+// Alias untuk kompatibilitas
+export { ScheduleCardImproved as ScheduleCard }

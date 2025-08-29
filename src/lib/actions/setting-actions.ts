@@ -120,6 +120,7 @@ export async function createSetting(input: CreateSettingInput) {
         })
 
         revalidatePath("/admin/settings")
+        revalidatePath('/', 'layout')
         return { success: true, data: setting }
     } catch (error) {
         console.error("Error creating setting:", error)
@@ -161,6 +162,7 @@ export async function updateSetting(input: UpdateSettingInput) {
         })
 
         revalidatePath("/admin/settings")
+        revalidatePath('/', 'layout')
         return { success: true, data: setting }
     } catch (error) {
         console.error("Error updating setting:", error)
@@ -183,6 +185,7 @@ export async function deleteSetting(id: string) {
         })
 
         revalidatePath("/admin/settings")
+        revalidatePath('/', 'layout')
         return { success: true }
     } catch (error) {
         console.error("Error deleting setting:", error)

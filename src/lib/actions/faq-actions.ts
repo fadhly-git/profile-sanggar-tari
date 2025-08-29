@@ -52,6 +52,8 @@ export async function createFAQ(data: z.infer<typeof faqSchema>) {
         })
 
         revalidatePath('/admin/faqs')
+        revalidatePath('/', 'layout')
+        revalidatePath('/kontak')
         return { success: true, data: faq }
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -72,6 +74,8 @@ export async function updateFAQ(id: string, data: z.infer<typeof faqSchema>) {
         })
 
         revalidatePath('/admin/faqs')
+        revalidatePath('/', 'layout')
+        revalidatePath('/kontak')
         return { success: true, data: faq }
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -89,6 +93,8 @@ export async function deleteFAQ(id: string) {
         })
 
         revalidatePath('/admin/faqs')
+        revalidatePath('/', 'layout')
+        revalidatePath('/kontak')
         return { success: true }
     } catch (error) {
         console.error('Error deleting FAQ:', error)
@@ -112,6 +118,8 @@ export async function toggleFAQStatus(id: string) {
         })
 
         revalidatePath('/admin/faqs')
+        revalidatePath('/', 'layout')
+        revalidatePath('/kontak')
         return { success: true, data: updatedFAQ }
     } catch (error) {
         console.error('Error toggling FAQ status:', error)
