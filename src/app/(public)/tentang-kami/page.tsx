@@ -27,6 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
     // Ambil metadata dari database atau gunakan default
     const pageTitle = pageMetaData?.title || `Tentang Kami | ${settings.site_name || 'Sanggar Tari Ngesti Laras Budaya'}`;
+    console.log("Page metadata Title:", pageMetaData?.title); // Debugging line
     const pageDescription = pageMetaData?.parsedMetadata?.description ||
         aboutData?.parsedMetadata?.description ||
         "Mengenal lebih dekat Sanggar Tari Ngesti Laras Budaya, sejarah, visi misi, dan komitmen kami dalam melestarikan seni tari tradisional dan modern di Boja, Meteseh Boja, Kab. Kendal sejak 2023.";

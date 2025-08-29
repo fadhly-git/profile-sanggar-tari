@@ -108,7 +108,7 @@ async function AboutSection() {
               title="Tentang Kami"
               subtitle={`Lebih dari ${metadata.founded_year ? new Date().getFullYear() - parseInt(metadata.founded_year, 10) : '25'} tahun mengembangkan bakat seni tari`}
             />
-            <div dangerouslySetInnerHTML={{ __html: aboutData.content }} className="prose max-w-none" />
+            <div dangerouslySetInnerHTML={{ __html: aboutData.content }} className="prose max-w-none text-justify" />
             <div className="grid grid-cols-2 gap-4">
               <Card>
                 <CardContent className="p-4 text-center">

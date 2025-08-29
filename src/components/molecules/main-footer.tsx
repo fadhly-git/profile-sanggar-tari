@@ -28,9 +28,9 @@ async function FooterContent() {
                     {/* Brand Info */}
                     <div className="space-y-4">
                         <Link href="/" className='cursor-pointer'>
-                            <h3 className="font-bold text-lg">{siteName}</h3>
+                            <h3 className="font-bold text-base">{siteName}</h3>
                         </Link>
-                        <p className="text-md text-muted-foreground">
+                        <p className="text-sm text-justify text-muted-foreground">
                             {siteDescription}
                         </p>
                         <div className="flex space-x-4">

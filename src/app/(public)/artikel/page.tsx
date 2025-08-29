@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const pageMetaData = pageMetaResult.success && pageMetaResult.data ? pageMetaResult.data : null;
 
     // Ambil metadata dari database atau gunakan default
-    const pageTitle = pageMetaData?.title || `Artikel | ${settings.site_name || 'Sanggar Tari Ngesti Laras Budaya'}`;
+    const pageTitle = `Artikel | ${settings.site_name || 'Sanggar Tari Ngesti Laras Budaya'}`;
     const pageDescription = pageMetaData?.parsedMetadata?.description ||
         "Baca artikel terbaru tentang seni tari, budaya Indonesia, tips pembelajaran tari, dan berita kegiatan dari Sanggar Tari Ngesti Laras Budaya di Boja, Meteseh Boja, Kab. Kendal.";
 

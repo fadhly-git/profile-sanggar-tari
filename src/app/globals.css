@@ -127,7 +127,7 @@ html, body {
 }
 
 .prose {
-  @apply text-foreground leading-relaxed max-w-none; /* Hapus text-pink-400, ganti dengan text-foreground */
+  @apply text-foreground leading-relaxed max-w-none text-justify; /* Hapus text-pink-400, ganti dengan text-foreground */
   color: inherit; /* Pastikan warna mengikuti theme */
 }
 

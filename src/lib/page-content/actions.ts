@@ -74,6 +74,8 @@ export async function createPageContent(formData: FormData) {
     })
 
     revalidatePath('/admin/page-content')
+    revalidatePath('/', 'layout')
+    revalidatePath('/', 'page')
     return { success: true }
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -102,6 +104,8 @@ export async function updatePageContent(id: string, formData: FormData) {
     })
 
     revalidatePath('/admin/page-content')
+    revalidatePath('/', 'layout')
+    revalidatePath('/', 'page')
     return { success: true }
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -119,6 +123,8 @@ export async function deletePageContent(id: string) {
     })
 
     revalidatePath('/admin/page-content')
+    revalidatePath('/', 'layout')
+    revalidatePath('/', 'page')
     return { success: true }
   } catch (error) {
     console.error('Error deleting page content:', error)
@@ -142,6 +148,8 @@ export async function togglePageContentStatus(id: string) {
     })
 
     revalidatePath('/admin/page-content')
+    revalidatePath('/', 'layout')
+    revalidatePath('/', 'page')
     return { success: true }
   } catch (error) {
     console.error('Error toggling page content status:', error)
